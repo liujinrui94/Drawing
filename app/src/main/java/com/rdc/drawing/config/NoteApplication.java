@@ -13,6 +13,9 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.rdc.drawing.board.dao.DaoMaster;
 import com.rdc.drawing.board.dao.DaoSession;
+import com.rdc.drawing.view.activity.BaseActivity;
+
+import java.util.Stack;
 
 /**
  * Created by lichaojian on 16-8-28.
@@ -39,7 +42,7 @@ public class NoteApplication extends Application {
     public static final String TEMPORARY_PATH = ROOT_DIRECTORY + "/temporary";
     public static final int OK = 1;
     public static final int CANCEL = -1;
-
+    public Stack<BaseActivity> allActivity = new Stack<>();
 
     private DaoMaster.DevOpenHelper mHelper;
     private SQLiteDatabase db;
@@ -52,7 +55,7 @@ public class NoteApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instances = this;
-        setDatabase();
+//        setDatabase();
     }
 
     public static NoteApplication getInstance() {
@@ -100,5 +103,38 @@ public class NoteApplication extends Application {
 
         ImageLoader.getInstance().init(config);
         return ImageLoader.getInstance();
+    }
+
+    public void addActivity(BaseActivity activity) {
+        if (allActivity == null) {
+            allActivity = new Stack<>();
+        }
+        allActivity.add(activity);
+    }
+
+    public void finishActivity(BaseActivity activity) {
+        if (activity != null) {
+            allActivity.remove(activity);
+        }
+    }
+
+    public void finishAllActivity() {
+        for (int i = 0, size = allActivity.size(); i < size; i++) {
+            if (null != allActivity.get(i)) {
+                allActivity.get(i).finish();
+            }
+        }
+        allActivity.clear();
+    }
+
+
+    public void AppExit() {
+        try {
+            finishAllActivity();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            System.exit(0);
+        }
     }
 }

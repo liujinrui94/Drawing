@@ -14,9 +14,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.rdc.drawing.bean.SaveData;
-import com.rdc.drawing.board.dao.DaoSession;
-import com.rdc.drawing.board.dao.SaveDataDao;
 import com.rdc.drawing.command.Command;
 import com.rdc.drawing.config.NoteApplication;
 import com.rdc.drawing.data.BaseDrawData;
@@ -35,7 +32,7 @@ import java.util.List;
 /**
  * Created by lichaojian on 16-8-28.
  */
-public class DrawView extends View implements DrawViewInterface{
+public class DrawView extends View implements DrawViewInterface {
 
     private static final String TAG = "DrawView";
     private Paint mPaint;//画笔
@@ -44,6 +41,8 @@ public class DrawView extends View implements DrawViewInterface{
     private int mCanvasCode = NoteApplication.CANVAS_NORMAL;
     private BaseDrawData mBaseDrawData = null;
     private BaseState mCurrentState = PathState.getInstance();//当前绘制的状态
+
+    private Boolean move = false;
 
     public DrawView(Context context) {
         super(context);
@@ -72,11 +71,21 @@ public class DrawView extends View implements DrawViewInterface{
         initCanvas();
     }
 
+
+    public Paint getmPaint() {
+        return mPaint;
+    }
+
+    public void setmPaint(Paint mPaint) {
+        this.mPaint = mPaint;
+    }
+
     private void initPaint() {
         mPaint = new Paint();
         mPaint.setColor(Color.parseColor("#FF4081"));
         mPaint.setStrokeWidth(10);
         mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setAntiAlias(true);
     }
 
     private void initCanvas() {
@@ -119,7 +128,6 @@ public class DrawView extends View implements DrawViewInterface{
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         mCanvasCode = NoteApplication.CANVAS_NORMAL;
-
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 actionDown(event);
@@ -133,15 +141,29 @@ public class DrawView extends View implements DrawViewInterface{
                 mCurrentState.pointerDownDrawData(event);
                 break;
             case MotionEvent.ACTION_MOVE:
+                move = true;
                 actionMove(event);
                 break;
             case MotionEvent.ACTION_UP:
+                if (!move) {
+//                    baseState = CircleState.getInstance();
+                    mPaint.setStyle(Paint.Style.FILL);
+                    mCanvas.drawCircle(event.getX(), event.getY(), mPaint.getStrokeWidth(), mPaint);
+//                    mCurrentState.onDraw(CircleState.getInstance(), mCanvas);
+                    move = false;
+                    break;
+                }
+                move = false;
                 actionUp(event);
                 break;
             case MotionEvent.ACTION_POINTER_UP:
+
+
                 mCurrentState.pointerUpDrawData(event);
+
                 break;
             default:
+
                 break;
         }
         invalidate();

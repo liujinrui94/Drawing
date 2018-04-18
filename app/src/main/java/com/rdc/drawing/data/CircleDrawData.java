@@ -7,7 +7,7 @@ import com.rdc.drawing.config.NoteApplication;
 /**
  * Created by lichaojian on 16-8-28.
  */
-public class CircleDrawData extends BaseDrawData{
+public class CircleDrawData extends BaseDrawData {
     private float mCircleX;
     private float mCircleY;
     private float mRadius;

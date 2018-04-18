@@ -14,5 +14,10 @@
     <color name="colorMode">#7891F5</color>
 
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="bule">#0000FE</color>
+
+    <color name="red">#FE0000</color>
 
 </resources>

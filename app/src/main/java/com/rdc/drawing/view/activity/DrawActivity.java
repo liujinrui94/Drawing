@@ -1,13 +1,20 @@
 package com.rdc.drawing.view.activity;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatDialog;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -15,7 +22,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +34,9 @@ import com.larswerkman.holocolorpicker.SVBar;
 import com.larswerkman.holocolorpicker.SaturationBar;
 import com.larswerkman.holocolorpicker.ValueBar;
 import com.rdc.drawing.R;
+import com.rdc.drawing.adapter.BaseRecyclerAdapter;
 import com.rdc.drawing.adapter.PictureAdapter;
+import com.rdc.drawing.adapter.SmartViewHolder;
 import com.rdc.drawing.config.NoteApplication;
 import com.rdc.drawing.state.BaseState;
 import com.rdc.drawing.state.CircleState;
@@ -38,8 +48,10 @@ import com.rdc.drawing.state.ShearState;
 import com.rdc.drawing.utils.CommandUtils;
 import com.rdc.drawing.utils.DrawDataUtils;
 import com.rdc.drawing.utils.FileUtils;
+import com.rdc.drawing.utils.ScreenBrightness;
 import com.rdc.drawing.view.widget.DrawView;
 import com.rdc.drawing.view.widget.ModeSelectWindow;
+import com.rdc.drawing.view.widget.QiuView;
 import com.rdc.drawing.view.widget.VerticalSeekBar;
 import com.rdc.drawing.view.widget.impl.ModeSelectCallBack;
 
@@ -54,7 +66,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     private static final String TAG = "DrawActivity";
     //初始化对话框
     private AppCompatDialog mAppCompatDialog;
-    private VerticalSeekBar mVerticalSeekBar;
+    private VerticalSeekBar mVerticalSeekBar, drawing_c_hb_seekBar;
     private DrawView mDrawView;
 
     private TextView mTVSelectMode;
@@ -68,6 +80,28 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     private PictureAdapter mPageAdapter;
     private List<String> list = null;
     private AlertDialog.Builder mBuilder;
+    private VerticalSeekBar right_seekBar;
+
+
+    private RecyclerView drawing_button_RecyclerView;
+
+    private LinearLayout drawing_button_linearlayout;
+
+    private BaseRecyclerAdapter baseRecyclerAdapter;
+
+    private List<String> color_list = new ArrayList<>();
+
+    private Toast toast = null;
+
+    private QiuView qiuView;
+    private View drawing_button_id;
+
+    private Button btn_back;
+
+    private LinearLayout ll_qunping;
+
+    public static final String ACTION_REQUEST_SHUTDOWN = "android.intent.action.ACTION_REQUEST_SHUTDOWN";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +116,6 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     private void initDrawData() {
         Intent intent = getIntent();
         mPicturePath = intent.getStringExtra("path");
-
         String filePath = intent.getStringExtra("filePath");
         if (mPicturePath != null) {
             Log.e("lichaojian--path", mPicturePath);
@@ -110,13 +143,119 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void initView() {
+        color_list.add("#000000");
+        color_list.add("#2020FE");
+        color_list.add("#FF0909");
+        color_list.add("#49972E");
+        color_list.add("#FFFFFF");
+        color_list.add("#787878");
+
+        color_list.add("#A50801");
+        color_list.add("#D84F19");
+        color_list.add("#EE5509");
+        color_list.add("#F09B1A");
+        color_list.add("#F6C119");
+        color_list.add("#F4E651");
+//
+        color_list.add("#D0DB1B");
+        color_list.add("#AFD244");
+        color_list.add("#09621D");
+        color_list.add("#71ACD6");
+        color_list.add("#001E86");
+        color_list.add("#A576EA");
+//
+        color_list.add("#B669EB");
+        color_list.add("#B24298");
+        color_list.add("#E65AA8");
+        color_list.add("#F8467E");
+        color_list.add("#FFC5D1");
+        color_list.add("#FFCCFF");
+
+        qiuView = new QiuView(DrawActivity.this);
+        drawing_button_id = findViewById(R.id.drawing_button_id);
+        drawing_button_RecyclerView = (RecyclerView) findViewById(R.id.drawing_button_RecyclerView);
+        drawing_button_linearlayout = (LinearLayout) findViewById(R.id.drawing_button_linearlayout);
+        drawing_button_RecyclerView.setNestedScrollingEnabled(false);
+        drawing_button_RecyclerView.setLayoutManager(new GridLayoutManager(getBaseContext(), 12));
+        drawing_button_RecyclerView.setItemAnimator(new DefaultItemAnimator());
+        drawing_button_RecyclerView.setHasFixedSize(true);
+        baseRecyclerAdapter = new BaseRecyclerAdapter<String>(color_list, R.layout.color_text_item) {
+            @Override
+            protected void onBindViewHolder(SmartViewHolder holder, final String model, int position) {
+                holder.itemView.findViewById(R.id.color_text_item_textView).setBackgroundColor(Color.parseColor(model));
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDrawView.setCurrentState(PathState.getInstance());
+                        mDrawView.changePaintColor(Color.parseColor(model));
+                        drawing_button_RecyclerView.setVisibility(View.GONE);
+                        drawing_button_linearlayout.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        };
+        drawing_button_RecyclerView.setAdapter(baseRecyclerAdapter);
+
+
+        findViewById(R.id.draw_color_one).setOnClickListener(this);
+        findViewById(R.id.draw_color_two).setOnClickListener(this);
+        findViewById(R.id.draw_color_three).setOnClickListener(this);
+        findViewById(R.id.drawing_go_back).setOnClickListener(this);
+        findViewById(R.id.drawing_go_clear).setOnClickListener(this);
+        findViewById(R.id.drawing_color).setOnClickListener(this);
+        findViewById(R.id.drawing_c_hb).setOnClickListener(this);
+        findViewById(R.id.drawing_c_light).setOnClickListener(this);
+        findViewById(R.id.drawing_c_tm).setOnClickListener(this);
+        findViewById(R.id.drawing_c_xp).setOnClickListener(this);
         //初始化颜色板
         initColorPickerDialog();
         //初始化自定义的ToolBar
         initToolbar();
         mDrawView = (DrawView) findViewById(R.id.draw_view);
         mVerticalSeekBar = (VerticalSeekBar) findViewById(R.id.seekBar);
+        ll_qunping = (LinearLayout) findViewById(R.id.ll_qunping);
+        drawing_c_hb_seekBar = (VerticalSeekBar) findViewById(R.id.drawing_c_hb_seekBar);
+        right_seekBar = (VerticalSeekBar) findViewById(R.id.right_seekBar);
         mVerticalSeekBar.setOnSeekBarChangeListener(this);
+        right_seekBar.setProgress(ScreenBrightness.getScreenBrightness(getBaseContext()));
+
+        drawing_c_hb_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mDrawView.getmPaint().setAlpha(i);
+                mDrawView.getmPaint().setColor(mDrawView.getmPaint().getColor());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        right_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                ScreenBrightness.setWindowBrightness(progress, DrawActivity.this);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
         mDrawView.changePaintSize(mVerticalSeekBar.getProgress());
         //初始化TAB
         initNavigationTab();
@@ -154,6 +293,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
      */
     private void initToolbar() {
         findViewById(R.id.ll_back).setOnClickListener(this);
+        findViewById(R.id.ll_qunping).setOnClickListener(this);
         findViewById(R.id.ll_num).setOnClickListener(this);
         findViewById(R.id.ll_add).setOnClickListener(this);
         findViewById(R.id.ll_undo).setOnClickListener(this);
@@ -201,7 +341,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     private void initDrawerLayout() {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        final ListView mListView = (ListView) findViewById(R.id.listView);
+//        final ListView mListView = (ListView) findViewById(R.id.listView);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 null, R.string.open, R.string.close) {
 
@@ -222,16 +362,99 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         mPageAdapter = new PictureAdapter(this, list);
-        mListView.setAdapter(mPageAdapter);
-        mListView.setOnItemClickListener(this);
+//        mListView.setAdapter(mPageAdapter);
+//        mListView.setOnItemClickListener(this);
     }
 
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+
+            case R.id.draw_color_one://第一个颜色
+                mDrawView.setCurrentState(PathState.getInstance());
+                mDrawView.changePaintColor(Color.parseColor("#000000"));
+                break;
+
+            case R.id.draw_color_two://第二个颜色
+
+                mDrawView.setCurrentState(PathState.getInstance());
+                mDrawView.changePaintColor(Color.parseColor("#0000FE"));
+                break;
+
+            case R.id.draw_color_three://第三个颜色
+
+                mDrawView.setCurrentState(PathState.getInstance());
+                mDrawView.changePaintColor(Color.parseColor("#FE0000"));
+
+                break;
+
+
+            case R.id.drawing_color://选择颜色
+//                mAppCompatDialog.show();
+                if (drawing_button_linearlayout.getVisibility() == View.VISIBLE) {
+                    drawing_button_linearlayout.setVisibility(View.GONE);
+                    drawing_button_RecyclerView.setVisibility(View.VISIBLE);
+                }
+                break;
+
+            case R.id.drawing_go_back://撤回一步
+
+                mDrawView.setCanvasCode(NoteApplication.CANVAS_UNDO);
+                mDrawView.invalidate();
+
+                break;
+
+            case R.id.drawing_go_clear://清除滑板
+
+                mDrawView.setCanvasCode(NoteApplication.CANVAS_RESET);
+                mDrawView.invalidate();
+                dataReset();
+
+                break;
+            case R.id.drawing_c_xp://橡皮
+                mDrawView.setCurrentState(EraserState.getInstance());
+                break;
+            case R.id.drawing_c_tm://粗细
+                if (mVerticalSeekBar.getVisibility() == View.VISIBLE) {
+                    mVerticalSeekBar.setVisibility(View.GONE);
+                } else {
+                    mVerticalSeekBar.setVisibility(View.VISIBLE);
+                }
+                break;
+            case R.id.drawing_c_hb://透明
+//                mAppCompatDialog.show();
+
+                if (drawing_c_hb_seekBar.getVisibility() == View.GONE) {
+                    drawing_c_hb_seekBar.setVisibility(View.VISIBLE);
+                } else {
+                    drawing_c_hb_seekBar.setVisibility(View.GONE);
+                }
+                break;
+            case R.id.drawing_c_light://亮度
+                if (right_seekBar.getVisibility() == View.VISIBLE) {
+                    right_seekBar.setVisibility(View.GONE);
+                } else {
+                    right_seekBar.setVisibility(View.VISIBLE);
+                }
+                break;
+
             case R.id.ll_back:
-                mBuilder.show();
+//                mBuilder.show();
+
+                if (drawing_button_id.getVisibility() == View.VISIBLE) {
+                    drawing_button_id.setVisibility(View.GONE);
+                    findViewById(R.id.toolbar).setVisibility(View.GONE);
+                    ll_qunping.setVisibility(View.VISIBLE);
+                } else {
+                    drawing_button_id.setVisibility(View.VISIBLE);
+                    findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
+                    findViewById(R.id.btn_back).setBackground(getResources().getDrawable(R.mipmap.full_screen));
+                    ll_qunping.setVisibility(View.GONE);
+                }
+
                 break;
             case R.id.ll_num:
                 mDrawerLayout.openDrawer(GravityCompat.START);
@@ -249,21 +472,36 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 mDrawView.invalidate();
                 break;
             case R.id.ll_redo:
-                mDrawView.setCanvasCode(NoteApplication.CANVAS_REDO);
-                mDrawView.invalidate();
+//                mDrawView.setCanvasCode(NoteApplication.CANVAS_REDO);
+//                mDrawView.invalidate();
+//                NoteApplication.getInstance().AppExit();
+
+                try {
+                    Log.v(TAG, "root Runtime->shutdown");
+                    Process proc = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot -p"}); //关机
+                    proc.waitFor();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.ll_reset:
                 // TODO: 2016/8/8 在此处弹出dialog让用户确认清空画布
-                mDrawView.setCanvasCode(NoteApplication.CANVAS_RESET);
-                mDrawView.invalidate();
-                dataReset();
+//                mDrawView.setCanvasCode(NoteApplication.CANVAS_RESET);
+//                mDrawView.invalidate();
+//                dataReset();
+//                mBuilder.show();
+//                save();
+                startActivity(new Intent(DrawActivity.this, MainActivity.class));
                 break;
             case R.id.ll_save:
-                if (mPageSize > 1) {
-                    copy();
-                } else {
-                    save();
-                }
+//                if (mPageSize > 1) {
+//                    copy();
+//                } else {
+//                    save();
+//                }
+                save();
+//                startActivity(new Intent(DrawActivity.this,MainActivity.class));
+
                 break;
             case R.id.rl_pencil_menu_select:
                 break;
@@ -279,6 +517,19 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
             case R.id.rl_hard_eraser:
                 mDrawView.setCurrentState(EraserState.getInstance());
                 break;
+            case R.id.ll_qunping:
+                if (drawing_button_id.getVisibility() == View.VISIBLE) {
+                    drawing_button_id.setVisibility(View.GONE);
+                    findViewById(R.id.toolbar).setVisibility(View.GONE);
+                    ll_qunping.setVisibility(View.VISIBLE);
+                } else {
+                    drawing_button_id.setVisibility(View.VISIBLE);
+                    findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
+                    findViewById(R.id.btn_back).setBackground(getResources().getDrawable(R.mipmap.full_screen));
+                    ll_qunping.setVisibility(View.GONE);
+                }
+                break;
+
             default:
                 Log.e(TAG, Integer.toString(v.getId()));
                 break;
@@ -332,6 +583,8 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         mDrawView.changePaintSize(progress);
+
+        ToastUtil(progress);
     }
 
     @Override
@@ -376,10 +629,10 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
             } else {
                 setResult(NoteApplication.CANCEL, intent);
             }
-            finish();
+//            finish();
         } else {
             showToast("保存失败,请检查当前画布是否为空。");
-            return;
+
         }
         mPicturePath = null;
     }
@@ -424,5 +677,19 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+
+    private void ToastUtil(int radius) {
+
+        qiuView.setRadius(radius);
+        if (toast != null) {
+            toast.cancel();
+        }
+        toast = new Toast(DrawActivity.this);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(qiuView);
+        toast.show();
     }
 }
