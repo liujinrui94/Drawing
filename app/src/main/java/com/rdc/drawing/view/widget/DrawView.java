@@ -147,12 +147,12 @@ public class DrawView extends View implements DrawViewInterface {
             case MotionEvent.ACTION_UP:
                 if (!move) {
 //                    baseState = CircleState.getInstance();
-                    mPaint.setStyle(Paint.Style.FILL);
-                    mCanvas.drawCircle(event.getX(), event.getY(), mPaint.getStrokeWidth(), mPaint);
+                mPaint.setStyle(Paint.Style.FILL);
+                mCanvas.drawCircle(event.getX(), event.getY(), mPaint.getStrokeWidth(), mPaint);
 //                    mCurrentState.onDraw(CircleState.getInstance(), mCanvas);
-                    move = false;
-                    break;
-                }
+                move = false;
+                break;
+            }
                 move = false;
                 actionUp(event);
                 break;
