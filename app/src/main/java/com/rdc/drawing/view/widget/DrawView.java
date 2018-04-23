@@ -8,17 +8,25 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
+import com.rdc.drawing.bean.SaveData;
+import com.rdc.drawing.board.dao.DaoSession;
+import com.rdc.drawing.board.dao.SaveDataDao;
 import com.rdc.drawing.command.Command;
 import com.rdc.drawing.config.NoteApplication;
 import com.rdc.drawing.data.BaseDrawData;
 import com.rdc.drawing.state.BaseState;
 import com.rdc.drawing.state.PathState;
+import com.rdc.drawing.utils.BaseProgressDialog;
 import com.rdc.drawing.utils.CommandUtils;
 import com.rdc.drawing.utils.DrawDataUtils;
 import com.rdc.drawing.utils.FileUtils;
@@ -42,21 +50,46 @@ public class DrawView extends View implements DrawViewInterface {
     private BaseDrawData mBaseDrawData = null;
     private BaseState mCurrentState = PathState.getInstance();//当前绘制的状态
 
-    private Boolean move = false;
+    private RadioGroup radioGroup;
+
+    private BaseProgressDialog baseProgressDialog;
+
+    private RecyclerView recyclerView;
+
+    private LinearLayout linearLayout;
+
+    private Context context;
+
+    private boolean canDraw = true;
 
     public DrawView(Context context) {
         super(context);
         initParameter(context);
+        this.context = context;
     }
 
     public DrawView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initParameter(context);
+        this.context = context;
     }
 
     public DrawView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initParameter(context);
+        this.context = context;
+    }
+
+    public void setRadioGroup(RadioGroup radioGroup) {
+        this.radioGroup = radioGroup;
+    }
+
+    public void setRecyclerView(RecyclerView recyclerView) {
+        this.recyclerView = recyclerView;
+    }
+
+    public void setLinearLayout(LinearLayout linearLayout) {
+        this.linearLayout = linearLayout;
     }
 
     public void setCanvasCode(int mCanvasCode) {
@@ -71,21 +104,37 @@ public class DrawView extends View implements DrawViewInterface {
         initCanvas();
     }
 
+    private void initPaint() {
+        mPaint = new Paint();
+        mPaint.setColor(Color.parseColor("#000000"));
+        mPaint.setStrokeWidth(10);
+        mPaint.setStyle(Paint.Style.STROKE);
+
+    }
 
     public Paint getmPaint() {
         return mPaint;
+    }
+
+    public void setMyAlpha(int alpha, int colorString, int stroke) {
+        mPaint = null;
+        mPaint = new Paint();
+        mPaint.setColor(colorString);
+        mPaint.setStrokeWidth(stroke);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setAlpha(alpha);
     }
 
     public void setmPaint(Paint mPaint) {
         this.mPaint = mPaint;
     }
 
-    private void initPaint() {
-        mPaint = new Paint();
-        mPaint.setColor(Color.parseColor("#FF4081"));
-        mPaint.setStrokeWidth(10);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setAntiAlias(true);
+    public boolean isCanDraw() {
+        return canDraw;
+    }
+
+    public void setCanDraw(boolean canDraw) {
+        this.canDraw = canDraw;
     }
 
     private void initCanvas() {
@@ -104,6 +153,7 @@ public class DrawView extends View implements DrawViewInterface {
 
     @Override
     protected void onDraw(Canvas canvas) {
+
         canvas.drawBitmap(mBitmap, 0, 0, mPaint);
         switch (mCanvasCode) {
             case NoteApplication.CANVAS_NORMAL:
@@ -127,7 +177,17 @@ public class DrawView extends View implements DrawViewInterface {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (radioGroup != null) {
+            radioGroup.clearCheck();
+
+        }
+        if (recyclerView.getVisibility() == VISIBLE) {
+            recyclerView.setVisibility(GONE);
+            linearLayout.setVisibility(VISIBLE);
+        }
+
         mCanvasCode = NoteApplication.CANVAS_NORMAL;
+
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 actionDown(event);
@@ -141,29 +201,15 @@ public class DrawView extends View implements DrawViewInterface {
                 mCurrentState.pointerDownDrawData(event);
                 break;
             case MotionEvent.ACTION_MOVE:
-                move = true;
                 actionMove(event);
                 break;
             case MotionEvent.ACTION_UP:
-                if (!move) {
-//                    baseState = CircleState.getInstance();
-                mPaint.setStyle(Paint.Style.FILL);
-                mCanvas.drawCircle(event.getX(), event.getY(), mPaint.getStrokeWidth(), mPaint);
-//                    mCurrentState.onDraw(CircleState.getInstance(), mCanvas);
-                move = false;
-                break;
-            }
-                move = false;
                 actionUp(event);
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-
-
                 mCurrentState.pointerUpDrawData(event);
-
                 break;
             default:
-
                 break;
         }
         invalidate();

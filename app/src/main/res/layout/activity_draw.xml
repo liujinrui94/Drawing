@@ -20,22 +20,11 @@
         <include
             android:id="@+id/toolbar"
             layout="@layout/toolbar"
+            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
 
-        <LinearLayout
-            android:id="@+id/ll_qunping"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="18dp"
-            android:visibility="gone">
-
-            <Button
-                android:id="@+id/btn_qunping"
-                style="@style/toolbar_item_btn_style"
-                android:background="@mipmap/shrink" />
-        </LinearLayout>
 
         <include
             layout="@layout/navigation_tab"

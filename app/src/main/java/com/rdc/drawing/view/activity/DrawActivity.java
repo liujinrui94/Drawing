@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -23,7 +25,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +50,7 @@ import com.rdc.drawing.state.LineState;
 import com.rdc.drawing.state.PathState;
 import com.rdc.drawing.state.RectangleState;
 import com.rdc.drawing.state.ShearState;
+import com.rdc.drawing.utils.BaseProgressDialog;
 import com.rdc.drawing.utils.CommandUtils;
 import com.rdc.drawing.utils.DrawDataUtils;
 import com.rdc.drawing.utils.FileUtils;
@@ -82,6 +88,9 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     private AlertDialog.Builder mBuilder;
     private VerticalSeekBar right_seekBar;
 
+    private TextView drawing_progress;
+
+    private int tmd = 0;
 
     private RecyclerView drawing_button_RecyclerView;
 
@@ -98,10 +107,27 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
     private Button btn_back;
 
-    private LinearLayout ll_qunping;
 
     public static final String ACTION_REQUEST_SHUTDOWN = "android.intent.action.ACTION_REQUEST_SHUTDOWN";
 
+    private TextView draw_color_one;
+
+    private ImageView c_xp;
+    private boolean isxp = false;
+
+//    private TextView c_hb;
+
+//    private TextView c_light;
+
+    private TextView drawing_color, drawing_c_hb_tv;
+
+    private RadioGroup drawing_button_rg;
+
+    private LinearLayout right_seekBar_ll, drawing_c_hb_ll, drawing_c_tm_progress_ll;
+
+    private LinearLayout ll_save, ll_reset, ll_redo;
+    private BaseProgressDialog baseProgressDialog;
+    private int stroke;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +137,9 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         setContentView(R.layout.activity_draw);
         initView();
         initDrawData();
+        mDrawView.setRadioGroup(drawing_button_rg);
+        mDrawView.setLinearLayout(drawing_button_linearlayout);
+        mDrawView.setRecyclerView(drawing_button_RecyclerView);
     }
 
     private void initDrawData() {
@@ -170,15 +199,22 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         color_list.add("#F8467E");
         color_list.add("#FFC5D1");
         color_list.add("#FFCCFF");
-
+        drawing_color = (TextView) findViewById(R.id.drawing_color);
+        baseProgressDialog = new BaseProgressDialog(DrawActivity.this);
         qiuView = new QiuView(DrawActivity.this);
         drawing_button_id = findViewById(R.id.drawing_button_id);
+        drawing_button_rg = (RadioGroup) findViewById(R.id.drawing_button_rg);
+        drawing_c_hb_tv = (TextView) findViewById(R.id.drawing_c_hb_tv);
         drawing_button_RecyclerView = (RecyclerView) findViewById(R.id.drawing_button_RecyclerView);
         drawing_button_linearlayout = (LinearLayout) findViewById(R.id.drawing_button_linearlayout);
         drawing_button_RecyclerView.setNestedScrollingEnabled(false);
         drawing_button_RecyclerView.setLayoutManager(new GridLayoutManager(getBaseContext(), 12));
         drawing_button_RecyclerView.setItemAnimator(new DefaultItemAnimator());
         drawing_button_RecyclerView.setHasFixedSize(true);
+
+        right_seekBar_ll = (LinearLayout) findViewById(R.id.right_seekBar_ll);
+        drawing_c_hb_ll = (LinearLayout) findViewById(R.id.drawing_c_hb_ll);
+        drawing_c_tm_progress_ll = (LinearLayout) findViewById(R.id.drawing_c_tm_progress_ll);
         baseRecyclerAdapter = new BaseRecyclerAdapter<String>(color_list, R.layout.color_text_item) {
             @Override
             protected void onBindViewHolder(SmartViewHolder holder, final String model, int position) {
@@ -186,8 +222,12 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        drawing_color.setBackgroundColor(Color.parseColor(model));
                         mDrawView.setCurrentState(PathState.getInstance());
                         mDrawView.changePaintColor(Color.parseColor(model));
+                        c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
+                        isxp = false;
+                        mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), Color.parseColor(model), mVerticalSeekBar.getProgress());
                         drawing_button_RecyclerView.setVisibility(View.GONE);
                         drawing_button_linearlayout.setVisibility(View.VISIBLE);
                     }
@@ -195,7 +235,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
             }
         };
         drawing_button_RecyclerView.setAdapter(baseRecyclerAdapter);
-
+        drawing_progress = (TextView) findViewById(R.id.drawing_progress);
 
         findViewById(R.id.draw_color_one).setOnClickListener(this);
         findViewById(R.id.draw_color_two).setOnClickListener(this);
@@ -203,27 +243,35 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         findViewById(R.id.drawing_go_back).setOnClickListener(this);
         findViewById(R.id.drawing_go_clear).setOnClickListener(this);
         findViewById(R.id.drawing_color).setOnClickListener(this);
-        findViewById(R.id.drawing_c_hb).setOnClickListener(this);
-        findViewById(R.id.drawing_c_light).setOnClickListener(this);
-        findViewById(R.id.drawing_c_tm).setOnClickListener(this);
-        findViewById(R.id.drawing_c_xp).setOnClickListener(this);
+//        c_hb = (TextView) findViewById(R.id.drawing_c_hb);
+//        c_hb.setOnClickListener(this);
+//        c_light = (TextView) findViewById(R.id.drawing_c_light);
+//        c_light.setOnClickListener(this);
+//        findViewById(R.id.drawing_c_tm).setOnClickListener(this);
+        c_xp = (ImageView) findViewById(R.id.drawing_c_xp);
+        c_xp.setOnClickListener(this);
         //初始化颜色板
         initColorPickerDialog();
         //初始化自定义的ToolBar
         initToolbar();
         mDrawView = (DrawView) findViewById(R.id.draw_view);
         mVerticalSeekBar = (VerticalSeekBar) findViewById(R.id.seekBar);
-        ll_qunping = (LinearLayout) findViewById(R.id.ll_qunping);
         drawing_c_hb_seekBar = (VerticalSeekBar) findViewById(R.id.drawing_c_hb_seekBar);
         right_seekBar = (VerticalSeekBar) findViewById(R.id.right_seekBar);
+
         mVerticalSeekBar.setOnSeekBarChangeListener(this);
         right_seekBar.setProgress(ScreenBrightness.getScreenBrightness(getBaseContext()));
 
         drawing_c_hb_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mDrawView.getmPaint().setAlpha(i);
+            public void onProgressChanged(SeekBar seekBar, int i, boolean bo) {
                 mDrawView.getmPaint().setColor(mDrawView.getmPaint().getColor());
+                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+                tmd = i;
+                double a = i;
+                double b = 255;
+                double d = a / b;
+                drawing_c_hb_tv.setText(String.format("%.2f", d));
             }
 
             @Override
@@ -238,10 +286,39 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         });
 
 
+        drawing_button_rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+
+                drawing_c_tm_progress_ll.setVisibility(View.INVISIBLE);
+                drawing_c_hb_ll.setVisibility(View.INVISIBLE);
+                right_seekBar_ll.setVisibility(View.INVISIBLE);
+                switch (radioGroup.getCheckedRadioButtonId()) {
+                    case R.id.rb_two:
+                        drawing_c_tm_progress_ll.setVisibility(View.VISIBLE);
+                        break;
+                    case R.id.rb_three:
+                        drawing_c_hb_ll.setVisibility(View.VISIBLE);
+                        break;
+                    case R.id.rb_four:
+                        right_seekBar_ll.setVisibility(View.VISIBLE);
+                        break;
+
+                }
+
+            }
+        });
+
+
         right_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 ScreenBrightness.setWindowBrightness(progress, DrawActivity.this);
+                double a = progress;
+                double b = 255;
+                double d = a / b;
+                drawing_progress.setText(String.format("%.2f", d));
+
             }
 
             @Override
@@ -293,13 +370,15 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
      */
     private void initToolbar() {
         findViewById(R.id.ll_back).setOnClickListener(this);
-        findViewById(R.id.ll_qunping).setOnClickListener(this);
         findViewById(R.id.ll_num).setOnClickListener(this);
         findViewById(R.id.ll_add).setOnClickListener(this);
         findViewById(R.id.ll_undo).setOnClickListener(this);
         findViewById(R.id.ll_redo).setOnClickListener(this);
         findViewById(R.id.ll_reset).setOnClickListener(this);
         findViewById(R.id.ll_save).setOnClickListener(this);
+        ll_save = (LinearLayout) findViewById(R.id.ll_save);
+        ll_reset = (LinearLayout) findViewById(R.id.ll_reset);
+        ll_redo = (LinearLayout) findViewById(R.id.ll_redo);
         mTVPageSize = (TextView) findViewById(R.id.tv_page_size);
     }
 
@@ -313,6 +392,8 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         mTVSelectMode = (TextView) findViewById(R.id.tv_select_mode);
         findViewById(R.id.rl_shear).setOnClickListener(this);
         findViewById(R.id.rl_hard_eraser).setOnClickListener(this);
+
+        draw_color_one = (TextView) findViewById(R.id.draw_color_one);
     }
 
     /**
@@ -337,6 +418,24 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         colorPicker.setOnColorChangedListener(this);
         colorPicker.setShowOldCenterColor(false);
     }
+
+//    private void chongzhi() {
+//        c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
+//        isxp = false;
+//        right_seekBar.setVisibility(View.GONE);
+//        drawing_c_hb_seekBar.setVisibility(View.GONE);
+//        mVerticalSeekBar.setVisibility(View.GONE);
+//        mDrawView.setCanDraw(true);
+//
+//        Drawable rightDrawable = getResources().getDrawable(R.mipmap.c_light);
+//        rightDrawable.setBounds(0, 0, rightDrawable.getMinimumWidth(), rightDrawable.getMinimumHeight());
+//        c_light.setCompoundDrawables(null, rightDrawable, null, null);
+//
+//        Drawable rightDrawable1 = getResources().getDrawable(R.mipmap.c_hb_not);
+//        rightDrawable1.setBounds(0, 0, rightDrawable1.getMinimumWidth(), rightDrawable1.getMinimumHeight());
+//        c_hb.setCompoundDrawables(null, rightDrawable1, null, null);
+//
+//    }
 
     private void initDrawerLayout() {
 
@@ -371,24 +470,47 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onClick(View v) {
+        right_seekBar_ll.setVisibility(View.INVISIBLE);
+        drawing_c_hb_ll.setVisibility(View.INVISIBLE);
+        drawing_c_tm_progress_ll.setVisibility(View.INVISIBLE);
+        drawing_button_rg.clearCheck();
         switch (v.getId()) {
 
             case R.id.draw_color_one://第一个颜色
+
                 mDrawView.setCurrentState(PathState.getInstance());
-                mDrawView.changePaintColor(Color.parseColor("#000000"));
+                ColorDrawable colorDrawable = (ColorDrawable) draw_color_one.getBackground();//获取背景颜色
+                colorDrawable.getColor();
+                mDrawView.changePaintColor(colorDrawable.getColor());
+                drawing_color.setBackgroundColor(colorDrawable.getColor());
+                mDrawView.setAlpha(tmd);
+                c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
+                isxp = false;
+                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+//                chongzhi();
                 break;
 
             case R.id.draw_color_two://第二个颜色
 
+//                mDrawView.setCurrentState(PathState.getInstance());
+//                ColorDrawable colorDrawable = (ColorDrawable) draw_color_one.getBackground();//获取背景颜色
+//                colorDrawable.getColor();
+//                mDrawView.changePaintColor(colorDrawable.getColor());
+                drawing_color.setBackgroundColor(Color.parseColor("#0000FE"));
                 mDrawView.setCurrentState(PathState.getInstance());
                 mDrawView.changePaintColor(Color.parseColor("#0000FE"));
+                c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
+                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+                isxp = false;
                 break;
 
             case R.id.draw_color_three://第三个颜色
-
+                drawing_color.setBackgroundColor(Color.parseColor("#FE0000"));
                 mDrawView.setCurrentState(PathState.getInstance());
                 mDrawView.changePaintColor(Color.parseColor("#FE0000"));
-
+                c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
+                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+                isxp = false;
                 break;
 
 
@@ -415,44 +537,59 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
                 break;
             case R.id.drawing_c_xp://橡皮
-                mDrawView.setCurrentState(EraserState.getInstance());
-                break;
-            case R.id.drawing_c_tm://粗细
-                if (mVerticalSeekBar.getVisibility() == View.VISIBLE) {
-                    mVerticalSeekBar.setVisibility(View.GONE);
+                if (isxp) {
+                    mDrawView.setCurrentState(PathState.getInstance());
+                    colorDrawable = (ColorDrawable) drawing_color.getBackground();
+                    colorDrawable.getColor();
+                    mDrawView.changePaintColor(colorDrawable.getColor());
+                    c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
+                    isxp = false;
                 } else {
-                    mVerticalSeekBar.setVisibility(View.VISIBLE);
+                    mDrawView.setCurrentState(EraserState.getInstance());
+                    c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp_not));
+                    isxp = true;
                 }
-                break;
-            case R.id.drawing_c_hb://透明
-//                mAppCompatDialog.show();
 
-                if (drawing_c_hb_seekBar.getVisibility() == View.GONE) {
-                    drawing_c_hb_seekBar.setVisibility(View.VISIBLE);
-                } else {
-                    drawing_c_hb_seekBar.setVisibility(View.GONE);
-                }
+
                 break;
-            case R.id.drawing_c_light://亮度
-                if (right_seekBar.getVisibility() == View.VISIBLE) {
-                    right_seekBar.setVisibility(View.GONE);
-                } else {
-                    right_seekBar.setVisibility(View.VISIBLE);
-                }
-                break;
+//            case R.id.drawing_c_tm://粗细
+//                mDrawView.setCanDraw(false);
+//                if (mVerticalSeekBar.getVisibility() == View.VISIBLE) {
+//                    mVerticalSeekBar.setVisibility(View.GONE);
+//                } else {
+//                    mVerticalSeekBar.setVisibility(View.VISIBLE);
+//                }
+//                break;
+//            case R.id.drawing_c_hb://透明
+//                mDrawView.setCanDraw(false);
+//                if (drawing_c_hb_seekBar.getVisibility() == View.GONE) {
+//                    drawing_c_hb_seekBar.setVisibility(View.VISIBLE);
+//
+//                    Drawable rightDrawable = getResources().getDrawable(R.mipmap.c_hb);
+//                    rightDrawable.setBounds(0, 0, rightDrawable.getMinimumWidth(), rightDrawable.getMinimumHeight());
+////                    c_hb.setCompoundDrawables(null, rightDrawable, null, null);
+//                } else {
+//                    drawing_c_hb_seekBar.setVisibility(View.GONE);
+//                    Drawable rightDrawable = getResources().getDrawable(R.mipmap.c_hb_not);
+//                    rightDrawable.setBounds(0, 0, rightDrawable.getMinimumWidth(), rightDrawable.getMinimumHeight());
+////                    c_hb.setCompoundDrawables(null, rightDrawable, null, null);
+//                }
+//                break;
 
             case R.id.ll_back:
-//                mBuilder.show();
-
-                if (drawing_button_id.getVisibility() == View.VISIBLE) {
+                if (ll_redo.getVisibility() == View.VISIBLE) {
+                    ll_redo.setVisibility(View.INVISIBLE);
+                    ll_reset.setVisibility(View.INVISIBLE);
+                    ll_save.setVisibility(View.INVISIBLE);
                     drawing_button_id.setVisibility(View.GONE);
-                    findViewById(R.id.toolbar).setVisibility(View.GONE);
-                    ll_qunping.setVisibility(View.VISIBLE);
+                    findViewById(R.id.btn_back).setBackground(getResources().getDrawable(R.mipmap.shrink));
                 } else {
                     drawing_button_id.setVisibility(View.VISIBLE);
-                    findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
+                    ll_redo.setVisibility(View.VISIBLE);
+                    ll_reset.setVisibility(View.VISIBLE);
+                    ll_save.setVisibility(View.VISIBLE);
+                    drawing_button_id.setVisibility(View.VISIBLE);
                     findViewById(R.id.btn_back).setBackground(getResources().getDrawable(R.mipmap.full_screen));
-                    ll_qunping.setVisibility(View.GONE);
                 }
 
                 break;
@@ -477,7 +614,6 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 //                NoteApplication.getInstance().AppExit();
 
                 try {
-                    Log.v(TAG, "root Runtime->shutdown");
                     Process proc = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot -p"}); //关机
                     proc.waitFor();
                 } catch (Exception e) {
@@ -517,18 +653,18 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
             case R.id.rl_hard_eraser:
                 mDrawView.setCurrentState(EraserState.getInstance());
                 break;
-            case R.id.ll_qunping:
-                if (drawing_button_id.getVisibility() == View.VISIBLE) {
-                    drawing_button_id.setVisibility(View.GONE);
-                    findViewById(R.id.toolbar).setVisibility(View.GONE);
-                    ll_qunping.setVisibility(View.VISIBLE);
-                } else {
-                    drawing_button_id.setVisibility(View.VISIBLE);
-                    findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
-                    findViewById(R.id.btn_back).setBackground(getResources().getDrawable(R.mipmap.full_screen));
-                    ll_qunping.setVisibility(View.GONE);
-                }
-                break;
+//            case R.id.ll_qunping:
+//                if (drawing_button_id.getVisibility() == View.VISIBLE) {
+//                    drawing_button_id.setVisibility(View.GONE);
+//                    findViewById(R.id.toolbar).setVisibility(View.GONE);
+//                    ll_qunping.setVisibility(View.VISIBLE);
+//                } else {
+//
+//                    findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
+//                    findViewById(R.id.btn_back).setBackground(getResources().getDrawable(R.mipmap.full_screen));
+//                    ll_qunping.setVisibility(View.GONE);
+//                }
+//                break;
 
             default:
                 Log.e(TAG, Integer.toString(v.getId()));
@@ -584,6 +720,11 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         mDrawView.changePaintSize(progress);
 
+        double a = progress;
+        double b = 255;
+        double d = a / b;
+        TextView textView = (TextView) findViewById(R.id.drawing_c_tm_progress);
+        textView.setText(String.format("%.2f", d));
         ToastUtil(progress);
     }
 
@@ -617,7 +758,13 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         ShearState.getInstance(mDrawView).destroy();
     }
 
+
     private void save() {
+
+        if (baseProgressDialog != null)
+            baseProgressDialog.cancel();
+        baseProgressDialog.setDialogDetail("");
+        baseProgressDialog.show();
         String fileName = mDrawView.save(mPicturePath, NoteApplication.ROOT_DIRECTORY);
         if (DrawDataUtils.getInstance().getSaveDrawDataList().size() > 0 && fileName != null) {
             showToast("保存成功");
@@ -629,11 +776,14 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
             } else {
                 setResult(NoteApplication.CANCEL, intent);
             }
-//            finish();
+            mDrawView.setCanvasCode(NoteApplication.CANVAS_RESET);
+            mDrawView.invalidate();
+            dataReset();
         } else {
             showToast("保存失败,请检查当前画布是否为空。");
 
         }
+        baseProgressDialog.dismiss();
         mPicturePath = null;
     }
 

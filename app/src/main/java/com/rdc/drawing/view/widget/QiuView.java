@@ -37,8 +37,10 @@ public class QiuView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawLine(canvas.getWidth() / 2, canvas.getHeight() / 2, canvas.getWidth() / 2 + 200, canvas.getHeight() / 2, paint);
+//        canvas.drawLine(canvas.getWidth() / 2, canvas.getHeight() / 2, canvas.getWidth() / 2 + 200, canvas.getHeight() / 2, paint);
 
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawCircle(canvas.getWidth() / 2, canvas.getHeight() / 2, paint.getStrokeWidth()/2, paint);
     }
 
     public int getRadius() {

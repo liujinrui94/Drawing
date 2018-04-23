@@ -2,7 +2,142 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+
+        <LinearLayout
+            android:id="@+id/drawing_c_tm_progress_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <TextView
+                android:id="@+id/drawing_c_tm_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textColor="@color/black" />
+
+            <com.rdc.drawing.view.widget.VerticalSeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="50dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="#F5F5F5"
+                android:gravity="center_horizontal"
+                android:progress="10"
+                android:scrollbarSize="300dp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/drawing_c_hb_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <TextView
+                android:id="@+id/drawing_c_hb_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textColor="@color/black" />
+
+            <com.rdc.drawing.view.widget.VerticalSeekBar
+                android:id="@+id/drawing_c_hb_seekBar"
+                android:layout_width="50dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="#F5F5F5"
+                android:gravity="center_horizontal"
+                android:max="255"
+                android:progress="10"
+                android:scrollbarSize="300dp"
+                android:thumbOffset="0dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/right_seekBar_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <TextView
+                android:id="@+id/drawing_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textColor="@color/black" />
+
+            <com.rdc.drawing.view.widget.VerticalSeekBar
+                android:id="@+id/right_seekBar"
+                android:layout_width="50dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center_vertical"
+                android:background="#F5F5F5"
+                android:max="255"
+                android:scrollbarSize="300dp"
+                android:thumbOffset="0dp" />
+        </LinearLayout>
+
+
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/drawing_button_RecyclerView"
@@ -19,7 +154,8 @@
         android:layout_height="match_parent"
         android:gravity="bottom"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:weightSum="10">
 
         <TextView
             android:id="@+id/draw_color_one"
@@ -44,16 +180,22 @@
             android:id="@+id/draw_color_three"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@color/red"
             android:padding="10dp" />
 
-        <ImageView
+        <TextView
             android:id="@+id/drawing_color"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:src="@mipmap/c_more" />
+            android:background="@color/black"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="20dp" />
 
         <ImageView
             android:id="@+id/drawing_go_back"
@@ -73,97 +215,67 @@
             android:id="@+id/drawing_c_xp"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_toRightOf="@id/drawing_go_clear"
             android:layout_weight="1"
             android:src="@mipmap/c_xp" />
 
-        <LinearLayout
+
+        <!-- <LinearLayout
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+             android:gravity="center_horizontal"
+             android:orientation="vertical"
+             android:visibility="gone">
+
+             <TextView
+                 android:id="@+id/drawing_c_hb"
+                 android:layout_width="50dp"
+                 android:layout_height="50dp"
+                 android:layout_weight="1"
+                 android:drawableTop="@mipmap/c_hb_not"
+                 android:gravity="center_horizontal|bottom"
+                 android:text="透明度"
+                 android:textColor="@color/black"
+                 android:visibility="gone" />
+         </LinearLayout>
+ -->
+
+        <RadioGroup
+            android:id="@+id/drawing_button_rg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:layout_weight="3"
+            android:orientation="horizontal">
 
-            <com.rdc.drawing.view.widget.VerticalSeekBar
-                android:id="@+id/drawing_c_hb_seekBar"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_marginBottom="10dp"
-                android:background="#F5F5F5"
-                android:max="255"
-                android:progress="10"
-                android:scrollbarSize="300dp"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/drawing_c_hb"
+            <RadioButton
+                android:id="@+id/rb_two"
+                style="@style/MyTabButton"
                 android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:drawableTop="@mipmap/c_hb"
-                android:gravity="center_horizontal|bottom"
+                android:layout_height="match_parent"
+                android:drawableTop="@drawable/selector_c_hb"
+                android:text="粗细"
+                android:textColor="@drawable/text_color" />
+
+            <RadioButton
+                android:id="@+id/rb_three"
+                style="@style/MyTabButton"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:drawableTop="@drawable/selector_tm"
                 android:text="透明度"
-                android:textColor="@color/black" />
-        </LinearLayout>
+                android:textColor="@drawable/text_color" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
-
-
-            <com.rdc.drawing.view.widget.VerticalSeekBar
-                android:id="@+id/seekBar"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_marginBottom="10dp"
-                android:background="#F5F5F5"
-                android:progress="10"
-                android:scrollbarSize="300dp"
-                android:visibility="gone" />
-
-
-            <TextView
-                android:id="@+id/drawing_c_tm"
+            <RadioButton
+                android:id="@+id/rb_four"
+                style="@style/MyTabButton"
                 android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:drawableTop="@mipmap/c_tm"
-                android:gravity="center_horizontal|bottom"
-                android:text="粗细度"
-                android:textColor="@color/black" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <com.rdc.drawing.view.widget.VerticalSeekBar
-                android:id="@+id/right_seekBar"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_marginBottom="10dp"
-                android:background="#F5F5F5"
-                android:max="255"
-                android:scrollbarSize="300dp"
-                android:visibility="gone" />
-
-
-            <TextView
-                android:id="@+id/drawing_c_light"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:drawableTop="@mipmap/c_light"
-                android:gravity="center_horizontal"
+                android:layout_height="match_parent"
+                android:drawableTop="@drawable/selector_liangdu"
                 android:text="亮度"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/text_color" />
 
-        </LinearLayout>
+        </RadioGroup>
 
 
     </LinearLayout>
