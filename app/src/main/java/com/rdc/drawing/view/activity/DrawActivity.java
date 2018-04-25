@@ -547,20 +547,26 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 //        drawing_c_hb_ll.setVisibility(View.INVISIBLE);
         drawing_c_tm_progress_ll.setVisibility(View.INVISIBLE);
         drawing_button_rg.clearCheck();
+        ColorDrawable colorDrawable = (ColorDrawable) draw_color_one.getBackground();//获取背景颜色
+        colorDrawable.getColor();
         switch (v.getId()) {
-
             case R.id.draw_color_one://第一个颜色
+//                mDrawView.setCurrentState(PathState.getInstance());
+//                drawing_color.setBackgroundColor(colorDrawable.getColor());
+//                mDrawView.setAlpha(tmd);
+//                c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
+//                isxp = false;
+//                mDrawView.changePaintColor( mDrawView.getmPaint().getColor());
+//                mDrawView.changePaintSize(mVerticalSeekBar.getProgress());
 
+                drawing_color.setBackgroundColor(Color.parseColor("#000000"));
                 mDrawView.setCurrentState(PathState.getInstance());
-                ColorDrawable colorDrawable = (ColorDrawable) draw_color_one.getBackground();//获取背景颜色
-                colorDrawable.getColor();
-                mDrawView.changePaintColor(colorDrawable.getColor());
-                drawing_color.setBackgroundColor(colorDrawable.getColor());
-                mDrawView.setAlpha(tmd);
                 c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
-                isxp = false;
 //                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
-//                chongzhi();
+                mDrawView.changePaintColor(Color.parseColor("#000000"));
+                mDrawView.changePaintSize(mVerticalSeekBar.getProgress());
+                isxp = false;
+
                 break;
 
             case R.id.draw_color_two://第二个颜色
@@ -571,9 +577,10 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 //                mDrawView.changePaintColor(colorDrawable.getColor());
                 drawing_color.setBackgroundColor(Color.parseColor("#0000FE"));
                 mDrawView.setCurrentState(PathState.getInstance());
-                mDrawView.changePaintColor(Color.parseColor("#0000FE"));
                 c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
 //                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+                mDrawView.changePaintColor( Color.parseColor("#0000FE"));
+                mDrawView.changePaintSize(mVerticalSeekBar.getProgress());
                 isxp = false;
                 break;
 
@@ -583,6 +590,8 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 mDrawView.changePaintColor(Color.parseColor("#FE0000"));
                 c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
 //                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+                mDrawView.changePaintColor( mDrawView.getmPaint().getColor());
+                mDrawView.changePaintSize(mVerticalSeekBar.getProgress());
                 isxp = false;
                 break;
 

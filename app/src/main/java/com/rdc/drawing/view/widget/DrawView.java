@@ -120,13 +120,12 @@ public class DrawView extends View implements DrawViewInterface {
         return mPaint;
     }
 
-    public void setMyAlpha(int alpha, int colorString, int stroke) {
-        mPaint = new Paint();
-        mPaint.setColor(colorString);
-        mPaint.setStrokeWidth(stroke);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setAlpha(alpha);
-    }
+//    public void setMyAlpha(int colorString, int stroke) {
+//        mPaint.setColor(colorString);
+//        mPaint.setStrokeWidth(stroke);
+//        mPaint.setStyle(Paint.Style.STROKE);
+//        mPaint.setAntiAlias(true);
+//    }
 
     public void setmPaint(Paint mPaint) {
         this.mPaint = mPaint;
@@ -182,7 +181,6 @@ public class DrawView extends View implements DrawViewInterface {
     public boolean onTouchEvent(MotionEvent event) {
         if (radioGroup != null) {
             radioGroup.clearCheck();
-
         }
         if (recyclerView.getVisibility() == VISIBLE) {
             recyclerView.setVisibility(GONE);
