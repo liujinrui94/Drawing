@@ -60,7 +60,10 @@ public class DrawView extends View implements DrawViewInterface {
 
     private Context context;
 
+    private List<BaseState> baseStateList = null;
+
     private boolean canDraw = true;
+
 
     public DrawView(Context context) {
         super(context);
@@ -109,6 +112,7 @@ public class DrawView extends View implements DrawViewInterface {
         mPaint.setColor(Color.parseColor("#000000"));
         mPaint.setStrokeWidth(10);
         mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setAntiAlias(true);
 
     }
 
@@ -117,7 +121,6 @@ public class DrawView extends View implements DrawViewInterface {
     }
 
     public void setMyAlpha(int alpha, int colorString, int stroke) {
-        mPaint = null;
         mPaint = new Paint();
         mPaint.setColor(colorString);
         mPaint.setStrokeWidth(stroke);

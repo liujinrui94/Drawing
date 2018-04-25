@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:weightSum="10">
+        android:padding="10dp"
+        android:weightSum="9">
 
         <TextView
             android:layout_width="50dp"
@@ -70,7 +71,7 @@
                 android:id="@+id/seekBar"
                 android:layout_width="50dp"
                 android:layout_height="200dp"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
                 android:background="#F5F5F5"
                 android:gravity="center_horizontal"
@@ -80,13 +81,13 @@
 
         </LinearLayout>
 
-        <LinearLayout
+       <!-- <LinearLayout
             android:id="@+id/drawing_c_hb_ll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:visibility="invisible">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/drawing_c_hb_tv"
@@ -99,7 +100,7 @@
                 android:id="@+id/drawing_c_hb_seekBar"
                 android:layout_width="50dp"
                 android:layout_height="200dp"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
                 android:background="#F5F5F5"
                 android:gravity="center_horizontal"
@@ -107,7 +108,7 @@
                 android:progress="10"
                 android:scrollbarSize="300dp"
                 android:thumbOffset="0dp" />
-        </LinearLayout>
+        </LinearLayout>-->
 
         <LinearLayout
             android:id="@+id/right_seekBar_ll"
@@ -129,7 +130,7 @@
                 android:id="@+id/right_seekBar"
                 android:layout_width="50dp"
                 android:layout_height="200dp"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="center_horizontal"
                 android:background="#F5F5F5"
                 android:max="255"
                 android:scrollbarSize="300dp"
@@ -155,7 +156,7 @@
         android:gravity="bottom"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:weightSum="10">
+        android:weightSum="9">
 
         <TextView
             android:id="@+id/draw_color_one"
@@ -187,15 +188,16 @@
 
         <TextView
             android:id="@+id/drawing_color"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="10dp"
+            android:layout_height="40dp"
             android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:background="@color/black"
-            android:paddingBottom="10dp"
+            android:paddingBottom="20dp"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:paddingTop="20dp" />
+            android:paddingTop="5dp" />
 
         <ImageView
             android:id="@+id/drawing_go_back"
@@ -245,7 +247,8 @@
             android:id="@+id/drawing_button_rg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
             android:orientation="horizontal">
 
             <RadioButton
@@ -254,17 +257,18 @@
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:drawableTop="@drawable/selector_c_hb"
+                android:layout_gravity="center_horizontal"
                 android:text="粗细"
                 android:textColor="@drawable/text_color" />
 
-            <RadioButton
-                android:id="@+id/rb_three"
-                style="@style/MyTabButton"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:drawableTop="@drawable/selector_tm"
-                android:text="透明度"
-                android:textColor="@drawable/text_color" />
+            <!--    <RadioButton
+                    android:id="@+id/rb_three"
+                    style="@style/MyTabButton"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:drawableTop="@drawable/selector_tm"
+                    android:text="透明度"
+                    android:textColor="@drawable/text_color" />-->
 
             <RadioButton
                 android:id="@+id/rb_four"
@@ -272,6 +276,7 @@
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:drawableTop="@drawable/selector_liangdu"
+                android:layout_gravity="center_horizontal"
                 android:text="亮度"
                 android:textColor="@drawable/text_color" />
 

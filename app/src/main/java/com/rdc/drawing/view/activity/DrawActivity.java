@@ -72,7 +72,8 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     private static final String TAG = "DrawActivity";
     //初始化对话框
     private AppCompatDialog mAppCompatDialog;
-    private VerticalSeekBar mVerticalSeekBar, drawing_c_hb_seekBar;
+    private VerticalSeekBar mVerticalSeekBar;
+//    private VerticalSeekBar  drawing_c_hb_seekBar;
     private DrawView mDrawView;
 
     private TextView mTVSelectMode;
@@ -123,7 +124,9 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
     private RadioGroup drawing_button_rg;
 
-    private LinearLayout right_seekBar_ll, drawing_c_hb_ll, drawing_c_tm_progress_ll;
+    private LinearLayout right_seekBar_ll,  drawing_c_tm_progress_ll;
+
+//    private LinearLayout drawing_c_hb_ll;
 
     private LinearLayout ll_save, ll_reset, ll_redo;
     private BaseProgressDialog baseProgressDialog;
@@ -200,11 +203,17 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         color_list.add("#FFC5D1");
         color_list.add("#FFCCFF");
         drawing_color = (TextView) findViewById(R.id.drawing_color);
+
+
+        ImageView drawing_go_back= (ImageView) findViewById(R.id.drawing_go_back);
+        drawing_color.setWidth(drawing_go_back.getWidth());
+        drawing_color.setHeight(drawing_go_back.getHeight());
+
         baseProgressDialog = new BaseProgressDialog(DrawActivity.this);
         qiuView = new QiuView(DrawActivity.this);
         drawing_button_id = findViewById(R.id.drawing_button_id);
         drawing_button_rg = (RadioGroup) findViewById(R.id.drawing_button_rg);
-        drawing_c_hb_tv = (TextView) findViewById(R.id.drawing_c_hb_tv);
+//        drawing_c_hb_tv = (TextView) findViewById(R.id.drawing_c_hb_tv);
         drawing_button_RecyclerView = (RecyclerView) findViewById(R.id.drawing_button_RecyclerView);
         drawing_button_linearlayout = (LinearLayout) findViewById(R.id.drawing_button_linearlayout);
         drawing_button_RecyclerView.setNestedScrollingEnabled(false);
@@ -213,7 +222,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         drawing_button_RecyclerView.setHasFixedSize(true);
 
         right_seekBar_ll = (LinearLayout) findViewById(R.id.right_seekBar_ll);
-        drawing_c_hb_ll = (LinearLayout) findViewById(R.id.drawing_c_hb_ll);
+//        drawing_c_hb_ll = (LinearLayout) findViewById(R.id.drawing_c_hb_ll);
         drawing_c_tm_progress_ll = (LinearLayout) findViewById(R.id.drawing_c_tm_progress_ll);
         baseRecyclerAdapter = new BaseRecyclerAdapter<String>(color_list, R.layout.color_text_item) {
             @Override
@@ -227,7 +236,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                         mDrawView.changePaintColor(Color.parseColor(model));
                         c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
                         isxp = false;
-                        mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), Color.parseColor(model), mVerticalSeekBar.getProgress());
+//                        mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), Color.parseColor(model), mVerticalSeekBar.getProgress());
                         drawing_button_RecyclerView.setVisibility(View.GONE);
                         drawing_button_linearlayout.setVisibility(View.VISIBLE);
                     }
@@ -256,34 +265,118 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         initToolbar();
         mDrawView = (DrawView) findViewById(R.id.draw_view);
         mVerticalSeekBar = (VerticalSeekBar) findViewById(R.id.seekBar);
-        drawing_c_hb_seekBar = (VerticalSeekBar) findViewById(R.id.drawing_c_hb_seekBar);
+//        drawing_c_hb_seekBar = (VerticalSeekBar) findViewById(R.id.drawing_c_hb_seekBar);
         right_seekBar = (VerticalSeekBar) findViewById(R.id.right_seekBar);
 
-        mVerticalSeekBar.setOnSeekBarChangeListener(this);
+
         right_seekBar.setProgress(ScreenBrightness.getScreenBrightness(getBaseContext()));
 
-        drawing_c_hb_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//        mVerticalSeekBar.setOnSeekBarChangeListener(this);
+//        drawing_c_hb_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean bo) {
+//
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//        });
+
+//        drawing_c_hb_seekBar.setMaxProgress(255);
+        mVerticalSeekBar.setMaxProgress(255);
+        right_seekBar.setMaxProgress(255);
+//        drawing_c_hb_seekBar.setOnSlideChangeListener(new VerticalSeekBar.SlideChangeListener() {
+//            @Override
+//            public void onStart(VerticalSeekBar slideView, int progress) {
+//
+//            }
+//
+//            @Override
+//            public void onProgress(VerticalSeekBar slideView, int progress) {
+//                mDrawView.getmPaint().setColor(mDrawView.getmPaint().getColor());
+//                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+//                tmd = progress;
+//                double a = progress;
+//                double b = 255;
+//                double d = a / b;
+//                drawing_c_hb_tv.setText(String.format("%.2f", d));
+//            }
+//
+//            @Override
+//            public void onStop(VerticalSeekBar slideView, int progress) {
+//
+//            }
+//        });
+        mVerticalSeekBar.setOnSlideChangeListener(new VerticalSeekBar.SlideChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean bo) {
-                mDrawView.getmPaint().setColor(mDrawView.getmPaint().getColor());
-                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
-                tmd = i;
-                double a = i;
+            public void onStart(VerticalSeekBar slideView, int progress) {
+
+            }
+
+            @Override
+            public void onProgress(VerticalSeekBar slideView, int progress) {
+                mDrawView.changePaintSize(progress);
+                double a = progress;
                 double b = 255;
                 double d = a / b;
-                drawing_c_hb_tv.setText(String.format("%.2f", d));
+                TextView textView = (TextView) findViewById(R.id.drawing_c_tm_progress);
+                textView.setText(String.format("%.2f", d));
+                ToastUtil(progress);
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStop(VerticalSeekBar slideView, int progress) {
 
             }
         });
+//        right_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//
+//
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//        });
+        right_seekBar.setOnSlideChangeListener(new VerticalSeekBar.SlideChangeListener() {
+            @Override
+            public void onStart(VerticalSeekBar slideView, int progress) {
+
+            }
+
+            @Override
+            public void onProgress(VerticalSeekBar slideView, int progress) {
+                ScreenBrightness.setWindowBrightness(progress, DrawActivity.this);
+                double a = progress;
+                double b = 255;
+                double d = a / b;
+                drawing_progress.setText(String.format("%.2f", d));
+            }
+
+            @Override
+            public void onStop(VerticalSeekBar slideView, int progress) {
+
+            }
+        });
+
+
+
+
 
 
         drawing_button_rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -291,15 +384,15 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
 
                 drawing_c_tm_progress_ll.setVisibility(View.INVISIBLE);
-                drawing_c_hb_ll.setVisibility(View.INVISIBLE);
+//                drawing_c_hb_ll.setVisibility(View.INVISIBLE);
                 right_seekBar_ll.setVisibility(View.INVISIBLE);
                 switch (radioGroup.getCheckedRadioButtonId()) {
-                    case R.id.rb_two:
+                   case R.id.rb_two:
                         drawing_c_tm_progress_ll.setVisibility(View.VISIBLE);
                         break;
-                    case R.id.rb_three:
+                  /*  case R.id.rb_three:
                         drawing_c_hb_ll.setVisibility(View.VISIBLE);
-                        break;
+                        break;*/
                     case R.id.rb_four:
                         right_seekBar_ll.setVisibility(View.VISIBLE);
                         break;
@@ -310,27 +403,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         });
 
 
-        right_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                ScreenBrightness.setWindowBrightness(progress, DrawActivity.this);
-                double a = progress;
-                double b = 255;
-                double d = a / b;
-                drawing_progress.setText(String.format("%.2f", d));
 
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
 
 
         mDrawView.changePaintSize(mVerticalSeekBar.getProgress());
@@ -471,7 +544,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onClick(View v) {
         right_seekBar_ll.setVisibility(View.INVISIBLE);
-        drawing_c_hb_ll.setVisibility(View.INVISIBLE);
+//        drawing_c_hb_ll.setVisibility(View.INVISIBLE);
         drawing_c_tm_progress_ll.setVisibility(View.INVISIBLE);
         drawing_button_rg.clearCheck();
         switch (v.getId()) {
@@ -486,7 +559,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 mDrawView.setAlpha(tmd);
                 c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
                 isxp = false;
-                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+//                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
 //                chongzhi();
                 break;
 
@@ -500,7 +573,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 mDrawView.setCurrentState(PathState.getInstance());
                 mDrawView.changePaintColor(Color.parseColor("#0000FE"));
                 c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
-                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+//                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
                 isxp = false;
                 break;
 
@@ -509,7 +582,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 mDrawView.setCurrentState(PathState.getInstance());
                 mDrawView.changePaintColor(Color.parseColor("#FE0000"));
                 c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
-                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
+//                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress(), mDrawView.getmPaint().getColor(), mVerticalSeekBar.getProgress());
                 isxp = false;
                 break;
 
@@ -628,6 +701,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 //                mBuilder.show();
 //                save();
                 startActivity(new Intent(DrawActivity.this, MainActivity.class));
+                DrawActivity.this.finish();
                 break;
             case R.id.ll_save:
 //                if (mPageSize > 1) {
@@ -718,14 +792,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        mDrawView.changePaintSize(progress);
 
-        double a = progress;
-        double b = 255;
-        double d = a / b;
-        TextView textView = (TextView) findViewById(R.id.drawing_c_tm_progress);
-        textView.setText(String.format("%.2f", d));
-        ToastUtil(progress);
     }
 
     @Override

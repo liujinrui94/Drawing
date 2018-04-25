@@ -69,6 +69,7 @@ public class MainAdapter extends BaseAdapter {
                     intent.putExtra("path", mPathList.get(position).getMap().get("picturePath"));
                     intent.putExtra("filePath", mPathList.get(position).getMap().get("filePath"));
                     mContext.startActivityForResult(intent, 2);
+
                 }
             });
 
