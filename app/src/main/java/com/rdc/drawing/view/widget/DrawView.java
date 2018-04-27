@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * Created by lichaojian on 16-8-28.
  */
-public class DrawView extends View implements DrawViewInterface {
+public class DrawView extends View implements DrawViewInterface ,View.OnClickListener{
 
     private static final String TAG = "DrawView";
     private Paint mPaint;//画笔
@@ -60,10 +60,7 @@ public class DrawView extends View implements DrawViewInterface {
 
     private Context context;
 
-    private List<BaseState> baseStateList = null;
-
     private boolean canDraw = true;
-
 
     public DrawView(Context context) {
         super(context);
@@ -112,7 +109,6 @@ public class DrawView extends View implements DrawViewInterface {
         mPaint.setColor(Color.parseColor("#000000"));
         mPaint.setStrokeWidth(10);
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setAntiAlias(true);
 
     }
 
@@ -120,12 +116,14 @@ public class DrawView extends View implements DrawViewInterface {
         return mPaint;
     }
 
-//    public void setMyAlpha(int colorString, int stroke) {
-//        mPaint.setColor(colorString);
-//        mPaint.setStrokeWidth(stroke);
-//        mPaint.setStyle(Paint.Style.STROKE);
-//        mPaint.setAntiAlias(true);
-//    }
+    public void setMyAlpha(int alpha, int colorString, int stroke) {
+        mPaint = null;
+        mPaint = new Paint();
+        mPaint.setColor(colorString);
+        mPaint.setStrokeWidth(stroke);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setAlpha(alpha);
+    }
 
     public void setmPaint(Paint mPaint) {
         this.mPaint = mPaint;
@@ -181,6 +179,7 @@ public class DrawView extends View implements DrawViewInterface {
     public boolean onTouchEvent(MotionEvent event) {
         if (radioGroup != null) {
             radioGroup.clearCheck();
+
         }
         if (recyclerView.getVisibility() == VISIBLE) {
             recyclerView.setVisibility(GONE);
@@ -347,5 +346,10 @@ public class DrawView extends View implements DrawViewInterface {
             command.getCommandDrawList().add(baseDrawData);
             CommandUtils.getInstance().getUndoCommandList().add(command);
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 }

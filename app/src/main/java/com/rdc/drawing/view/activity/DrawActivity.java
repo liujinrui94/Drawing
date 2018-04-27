@@ -290,7 +290,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 //        });
 
 //        drawing_c_hb_seekBar.setMaxProgress(255);
-        mVerticalSeekBar.setMaxProgress(255);
+        mVerticalSeekBar.setMaxProgress(100);
         right_seekBar.setMaxProgress(255);
 //        drawing_c_hb_seekBar.setOnSlideChangeListener(new VerticalSeekBar.SlideChangeListener() {
 //            @Override
@@ -322,7 +322,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
             @Override
             public void onProgress(VerticalSeekBar slideView, int progress) {
-                mDrawView.changePaintSize(progress);
+                mDrawView.changePaintSize(progress/4);
                 double a = progress;
                 double b = 255;
                 double d = a / b;
@@ -708,9 +708,14 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 //                mDrawView.invalidate();
 //                dataReset();
 //                mBuilder.show();
-//                save();
-                startActivity(new Intent(DrawActivity.this, MainActivity.class));
-                DrawActivity.this.finish();
+                if (mDrawView.isCanDraw()){
+                    save();
+                    startActivity(new Intent(DrawActivity.this, MainActivity.class));
+                }else {
+                    startActivity(new Intent(DrawActivity.this, MainActivity.class));
+                }
+
+//                DrawActivity.this.finish();
                 break;
             case R.id.ll_save:
 //                if (mPageSize > 1) {
@@ -718,7 +723,12 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 //                } else {
 //                    save();
 //                }
-                save();
+                if (mDrawView.isCanvas()){
+                    save();
+                }else {
+                    Toast.makeText(getBaseContext(),"没有内容",Toast.LENGTH_SHORT).show();
+                }
+
 //                startActivity(new Intent(DrawActivity.this,MainActivity.class));
 
                 break;
@@ -908,7 +918,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
     private void ToastUtil(int radius) {
 
-        qiuView.setRadius(radius);
+        qiuView.setRadius(radius/4);
         if (toast != null) {
             toast.cancel();
         }
