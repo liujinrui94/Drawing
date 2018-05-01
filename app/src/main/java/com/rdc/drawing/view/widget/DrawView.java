@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * Created by lichaojian on 16-8-28.
  */
-public class DrawView extends View implements DrawViewInterface ,View.OnClickListener{
+public class DrawView extends View implements DrawViewInterface, View.OnClickListener {
 
     private static final String TAG = "DrawView";
     private Paint mPaint;//画笔
@@ -49,11 +49,11 @@ public class DrawView extends View implements DrawViewInterface ,View.OnClickLis
     private int mCanvasCode = NoteApplication.CANVAS_NORMAL;
     private BaseDrawData mBaseDrawData = null;
     private BaseState mCurrentState = PathState.getInstance();//当前绘制的状态
+    private Boolean HasDraw=false;
 
-    private RadioGroup radioGroup;
 
     private BaseProgressDialog baseProgressDialog;
-
+    private RadioGroup radioGroup;
     private RecyclerView recyclerView;
 
     private LinearLayout linearLayout;
@@ -78,6 +78,12 @@ public class DrawView extends View implements DrawViewInterface ,View.OnClickLis
         super(context, attrs, defStyleAttr);
         initParameter(context);
         this.context = context;
+    }
+
+
+
+    public void setHasDraw(Boolean hasDraw) {
+        HasDraw = hasDraw;
     }
 
     public void setRadioGroup(RadioGroup radioGroup) {

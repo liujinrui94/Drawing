@@ -50,12 +50,14 @@ public class NoteApplication extends Application {
     private DaoSession mDaoSession;
     //静态单例
     public static NoteApplication instances;
-
+    public static NoteApplication getsInstance() {
+        return instances;
+    }
     @Override
     public void onCreate() {
         super.onCreate();
         instances = this;
-//        setDatabase();
+        setDatabase();
     }
 
     public static NoteApplication getInstance() {

@@ -34,6 +34,7 @@ dependencies {
     compile 'com.larswerkman:HoloColorPicker:1.5'
     compile 'org.greenrobot:greendao:3.2.2' // add library
     compile 'org.greenrobot:greendao-generator:3.2.2'
+    compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.3'
     compile 'com.github.bumptech.glide:glide:3.8.0'
 }

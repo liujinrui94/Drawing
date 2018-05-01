@@ -11,6 +11,7 @@ import com.rdc.drawing.data.BaseDrawData;
 import com.rdc.drawing.data.PathDrawData;
 import com.rdc.drawing.utils.CommandUtils;
 import com.rdc.drawing.utils.DrawDataUtils;
+import com.rdc.drawing.view.widget.signature.FirstPoint;
 
 /**
  * Created by lichaojian on 16-8-28.
@@ -18,7 +19,7 @@ import com.rdc.drawing.utils.DrawDataUtils;
 public class PathState extends BaseState {
     private static PathState mPathState = null;
     private PathDrawData mPathDrawData;
-
+    private FirstPoint firstPoint;
     private PathState() {
     }
 
@@ -34,6 +35,7 @@ public class PathState extends BaseState {
         if (baseDrawData != null) {
             PathDrawData pathDrawData = (PathDrawData) baseDrawData;
             canvas.drawPath(pathDrawData.getPath(), pathDrawData.getPaint());
+            firstPoint.draw(canvas, pathDrawData.getPaint());
         }
     }
 

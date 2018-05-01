@@ -3,20 +3,32 @@ package com.rdc.drawing.bean;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Transient;
+
+import java.io.Serializable;
 
 /**
  * Created by Edianzu on 2018/4/12.
  */
 @Entity
-public class SaveData {
-
+public class SaveData implements Serializable {
+    @Transient
+    private static final long serialVersionUID = -3392110595941354319L;
     @Id
     private Long id;
     private String imageName;
     private String picturePath;
-
+    @Transient
+    private boolean select=false;
     private String filePath;
 
+    public boolean isSelect() {
+        return select;
+    }
+
+    public void setSelect(boolean select) {
+        this.select = select;
+    }
 
     public String getPicturePath() {
         return picturePath;

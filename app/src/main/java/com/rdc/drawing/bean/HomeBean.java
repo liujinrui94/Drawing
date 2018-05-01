@@ -1,5 +1,6 @@
 package com.rdc.drawing.bean;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +8,7 @@ import java.util.Map;
  * Created by Edianzu on 2018/4/18.
  */
 
-public class HomeBean {
+public class HomeBean implements Serializable {
 
     Map<String, String>  map= new HashMap<String, String>();
 

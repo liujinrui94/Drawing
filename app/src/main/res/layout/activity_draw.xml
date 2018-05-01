@@ -12,7 +12,9 @@
         tools:context="com.seewo.note.activity.DrawActivity">
 
 
-        <com.rdc.drawing.view.widget.DrawView
+
+
+        <com.rdc.drawing.view.widget.signature.DrawView
             android:id="@+id/draw_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
