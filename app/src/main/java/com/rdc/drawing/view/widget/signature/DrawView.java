@@ -85,8 +85,10 @@ public class DrawView extends View implements View.OnTouchListener {
     }
 
     public void BackView() {
-        points.remove(points.size() - 1);
-        invalidate();
+        if (points.size() > 0) {
+            points.remove(points.size() - 1);
+            invalidate();
+        }
     }
 
     public void clearView() {
@@ -137,39 +139,51 @@ public class DrawView extends View implements View.OnTouchListener {
             return bitmap;
         }
     }
-    public static String getTimeNew(){
+
+    public static String getTimeNew() {
         String time;
-        Calendar calendar=Calendar.getInstance();
-        time=calendar.get(Calendar.YEAR)+"-"+calendar.get(Calendar.MONTH)+"-"+calendar.get(Calendar.DAY_OF_MONTH)+
-                "-"+calendar.get(Calendar.HOUR_OF_DAY)+"-"+calendar.get(Calendar.MINUTE)+"-"+calendar.get(Calendar.SECOND);
+        Calendar calendar = Calendar.getInstance();
+        time = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DAY_OF_MONTH) +
+                "-" + calendar.get(Calendar.HOUR_OF_DAY) + "-" + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.SECOND);
         return time;
     }
+
     public void saveNew(Context context) {
-        Uri uri = ImageUtil.getUriFromBitmap(saveSignature(),getTimeNew());
+        if (points.size() < 1) {
+            Toast.makeText(context, "暂未修改", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Uri uri = ImageUtil.getUriFromBitmap(saveSignature(), getTimeNew());
         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);  // 这是刷新单个文件
         intent.setData(uri);
         context.sendBroadcast(intent);
-        SaveData saveData=new SaveData();
+        SaveData saveData = new SaveData();
         saveData.setImageName(getFileName(uri.toString()));
         saveData.setPicturePath(ImageUtil.getRealFilePath(context, uri));
         daoSession.getSaveDataDao().insert(saveData);
-        Toast.makeText(context,"保存成功",Toast.LENGTH_SHORT).show();
+        clearView();
+        Toast.makeText(context, "保存成功", Toast.LENGTH_SHORT).show();
     }
-    public void updata(SaveData saveData,Context context) {
-        Uri uri = ImageUtil.getUriFromBitmap(saveSignature(),saveData.getImageName());
+
+    public void updata(SaveData saveData, Context context) {
+        if (points.size() < 1) {
+            Toast.makeText(context, "暂未修改", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Uri uri = ImageUtil.getUriFromBitmap(saveSignature(), saveData.getImageName());
         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);  // 这是刷新单个文件
         intent.setData(uri);
         context.sendBroadcast(intent);
     }
 
 
-    public String getFileName(String pathandname){
+    public String getFileName(String pathandname) {
 
-        int start=pathandname.lastIndexOf("/");
-        int end=pathandname.lastIndexOf(".");
-        if(start!=-1 && end!=-1){
-            return pathandname.substring(start+1,end);
-        }else{
+        int start = pathandname.lastIndexOf("/");
+        int end = pathandname.lastIndexOf(".");
+        if (start != -1 && end != -1) {
+            return pathandname.substring(start + 1, end);
+        } else {
             return null;
         }
 
@@ -204,6 +218,7 @@ public class DrawView extends View implements View.OnTouchListener {
             float firstY = event.getY();
             point = new FollowPoints(firstX, firstY, PaintColor,
                     PaintSize, points.get(points.size() - 1), alpha);
+
         } else if (action == MotionEvent.ACTION_DOWN) {
             float lastX = event.getX();
             float lastY = event.getY();

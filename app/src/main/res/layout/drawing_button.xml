@@ -89,7 +89,7 @@
             android:layout_weight="1"
             android:background="#F5F5F5"
             android:orientation="vertical"
-            android:visibility="invisible">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/drawing_c_hb_tv"
@@ -266,6 +266,7 @@
                 android:id="@+id/rb_three"
                 style="@style/MyTabButton"
                 android:layout_width="50dp"
+                android:visibility="gone"
                 android:layout_height="match_parent"
                 android:drawableTop="@drawable/selector_tm"
                 android:text="透明度"

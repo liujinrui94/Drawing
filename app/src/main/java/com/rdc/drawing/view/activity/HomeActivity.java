@@ -64,6 +64,14 @@ public class HomeActivity extends Activity {
                 startActivity(intent);
             }
         });
+
+        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         findViewById(R.id.delect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,7 +81,7 @@ public class HomeActivity extends Activity {
                         File file = new File(saveDataList.get(i).getPicturePath());
                         FileUtils.delete(file);
                         saveDataList.remove(saveDataList.get(i));
-                        i=0;
+                        i = 0;
                         continue;
                     }
                 }
@@ -95,8 +103,7 @@ public class HomeActivity extends Activity {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(getBaseContext(), DrawActivity.class);
-                        Log.e("AAA",model.toString());
-                        intent.putExtra("model",model);
+                        intent.putExtra("model", model);
                         startActivity(intent);
                     }
                 });
