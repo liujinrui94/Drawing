@@ -153,6 +153,15 @@ public class FileUtils {
         return isOk;
     }
 
+
+    public static boolean ExistSDCard() {
+        if (android.os.Environment.getExternalStorageState().equals(
+                android.os.Environment.MEDIA_MOUNTED)) {
+            return true;
+        } else
+            return false;
+    }
+
     /**
      * 删除文件夹下的文件
      *

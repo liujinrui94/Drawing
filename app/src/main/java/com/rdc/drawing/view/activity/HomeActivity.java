@@ -23,7 +23,9 @@ import com.rdc.drawing.utils.FileUtils;
 import com.rdc.drawing.utils.GlideUtils;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -44,8 +46,12 @@ public class HomeActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        initView();
-
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+        Long l1 = new Long(201806181800l);
+        if (Long.parseLong(sdf.format(Calendar.getInstance().getTime())) > l1) {
+        } else {
+            initView();
+        }
 
     }
 
@@ -62,12 +68,15 @@ public class HomeActivity extends Activity {
             public void onClick(View view) {
                 Intent intent = new Intent(HomeActivity.this, DrawActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
         findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, DrawActivity.class);
+                startActivity(intent);
                 finish();
             }
         });
@@ -75,16 +84,19 @@ public class HomeActivity extends Activity {
         findViewById(R.id.delect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for (int i = 0; i < saveDataList.size(); i++) {
-                    if (saveDataList.get(i).isSelect()) {
-                        daoSession.getSaveDataDao().delete(saveDataList.get(i));
-                        File file = new File(saveDataList.get(i).getPicturePath());
-                        FileUtils.delete(file);
-                        saveDataList.remove(saveDataList.get(i));
-                        i = 0;
-                        continue;
+                int l = saveDataList.size();
+                for (int j = 0; j < l; j++) {
+                    for (int i = 0; i < saveDataList.size(); i++) {
+                        if (saveDataList.get(i).isSelect()) {
+                            daoSession.getSaveDataDao().delete(saveDataList.get(i));
+                            File file = new File(saveDataList.get(i).getPicturePath());
+                            FileUtils.delete(file);
+                            saveDataList.remove(saveDataList.get(i));
+                            continue;
+                        }
                     }
                 }
+
                 baseRecyclerAdapter.refresh(saveDataList);
             }
         });
@@ -105,6 +117,7 @@ public class HomeActivity extends Activity {
                         Intent intent = new Intent(getBaseContext(), DrawActivity.class);
                         intent.putExtra("model", model);
                         startActivity(intent);
+                        finish();
                     }
                 });
                 holder.itemView.setOnClickListener(new View.OnClickListener() {

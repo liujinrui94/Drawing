@@ -13,6 +13,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.rdc.drawing.board.dao.DaoMaster;
 import com.rdc.drawing.board.dao.DaoSession;
+import com.rdc.drawing.utils.CrashHandler;
 import com.rdc.drawing.view.activity.BaseActivity;
 
 import java.util.Stack;
@@ -57,6 +58,7 @@ public class NoteApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instances = this;
+        CrashHandler.getInstance().init(this);
         setDatabase();
     }
 

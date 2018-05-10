@@ -47,7 +47,7 @@
             android:background="#FC73B7"
             android:gravity="center"
             android:padding="5dp"
-            android:text="预览"
+            android:text="载入"
             android:textColor="@color/white" />
 
         <ImageView

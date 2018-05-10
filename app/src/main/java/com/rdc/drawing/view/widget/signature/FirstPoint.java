@@ -24,6 +24,12 @@ public class FirstPoint extends Point {
         this.width = width;
         this.alpha=alpha;
     }
+    public FirstPoint(float x, float y, int color, int width) {
+        this.fx = x;
+        this.fy = y;
+        this.color = color;
+        this.width = width;
+    }
 
     public void draw(Canvas canvas, Paint paint) {
         paint.setColor(this.color);

@@ -22,6 +22,7 @@ import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -29,8 +30,10 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -59,6 +62,7 @@ import com.rdc.drawing.utils.FileUtils;
 import com.rdc.drawing.utils.ScreenBrightness;
 import com.rdc.drawing.view.widget.ModeSelectWindow;
 import com.rdc.drawing.view.widget.QiuView;
+import com.rdc.drawing.view.widget.SketchView;
 import com.rdc.drawing.view.widget.VerticalSeekBar;
 import com.rdc.drawing.view.widget.signature.DrawView;
 
@@ -69,14 +73,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawActivity extends BaseActivity implements View.OnClickListener {
+public class DrawActivity extends BaseActivity implements View.OnClickListener, SketchView.OnDrawChangedListener {
 
     private static final String TAG = "DrawActivity";
     //初始化对话框
     private AppCompatDialog mAppCompatDialog;
     private VerticalSeekBar mVerticalSeekBar;
-    private VerticalSeekBar drawing_c_hb_seekBar;
-    private DrawView mDrawView;
+//    private VerticalSeekBar drawing_c_hb_seekBar;
+//    private DrawView mDrawView;
 
     private TextView mTVSelectMode;
     private TextView mTVPageSize;
@@ -122,7 +126,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
 
 //    private TextView c_light;
 
-    private TextView drawing_color, drawing_c_hb_tv;
+    private TextView drawing_color;
 
     private RadioGroup drawing_button_rg;
 
@@ -130,11 +134,15 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
 
 //    private LinearLayout drawing_c_hb_ll;
 
+    private SketchView mSketchView;
+
     private LinearLayout ll_save, ll_reset, ll_redo;
     private BaseProgressDialog baseProgressDialog;
     private int stroke = 6;
     private SaveData saveData = null;
     private Bitmap bitmap;
+    private int mScreenWidth;
+    private int mScreenHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,14 +153,26 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
         initView();
 
         saveData = (SaveData) getIntent().getSerializableExtra("model");
+        mSketchView = (SketchView) findViewById(R.id.drawing);
         if (saveData != null) {
             releaseImageViewResouce();
             bitmap = BitmapFactory.decodeFile(saveData.getPicturePath());
-            mDrawView.DrawBitmap(bitmap);
+            mSketchView.setBitmap(bitmap);
         }
-        mDrawView.setRadioGroup(drawing_button_rg);
-        mDrawView.setLinearLayout(drawing_button_linearlayout);
-        mDrawView.setRecyclerView(drawing_button_RecyclerView);
+        mSketchView.setRadioGroup(drawing_button_rg);
+        mSketchView.setLinearLayout(drawing_button_linearlayout);
+        mSketchView.setRecyclerView(drawing_button_RecyclerView);
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        // 获取屏幕分辨率宽度
+        mScreenWidth = dm.widthPixels;
+        mScreenHeight = dm.heightPixels;
+        // 给mSketchView设置宽高
+        FrameLayout.LayoutParams p = (FrameLayout.LayoutParams) mSketchView.getLayoutParams();
+        p.width = mScreenWidth;
+        p.height = mScreenHeight;
+        mSketchView.setLayoutParams(p);
+
     }
 
 
@@ -170,31 +190,31 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void initDrawData() {
-        Intent intent = getIntent();
-        mPicturePath = intent.getStringExtra("path");
-        String filePath = intent.getStringExtra("filePath");
-        if (mPicturePath != null) {
-            Log.e("lichaojian--path", mPicturePath);
-            String xmlPath = mPicturePath.substring(0, mPicturePath.length() - 3) + "xml";
-            DrawDataUtils.getInstance().structureReReadXMLData("file://" + xmlPath);
-            if (!filePath.equals("null") && filePath != null) {
-                File file = new File(filePath);
-                File[] allFiles = file.listFiles();
-                for (int i = 0; i < allFiles.length; ++i) {
-                    if (allFiles[i].getPath().contains("png")) {
-                        list.add(allFiles[i].getPath());
-                    }
-                }
-            }
-        }
-
-        mPageSize = list.size();
-        if (mPageSize == 0) {
-            mPageSize = 1;
-        }
-        mTVPageSize.setText(Integer.toString(mPageSize));
-    }
+//    private void initDrawData() {
+//        Intent intent = getIntent();
+//        mPicturePath = intent.getStringExtra("path");
+//        String filePath = intent.getStringExtra("filePath");
+//        if (mPicturePath != null) {
+//            Log.e("lichaojian--path", mPicturePath);
+//            String xmlPath = mPicturePath.substring(0, mPicturePath.length() - 3) + "xml";
+//            DrawDataUtils.getInstance().structureReReadXMLData("file://" + xmlPath);
+//            if (!filePath.equals("null") && filePath != null) {
+//                File file = new File(filePath);
+//                File[] allFiles = file.listFiles();
+//                for (int i = 0; i < allFiles.length; ++i) {
+//                    if (allFiles[i].getPath().contains("png")) {
+//                        list.add(allFiles[i].getPath());
+//                    }
+//                }
+//            }
+//        }
+//
+//        mPageSize = list.size();
+//        if (mPageSize == 0) {
+//            mPageSize = 1;
+//        }
+//        mTVPageSize.setText(Integer.toString(mPageSize));
+//    }
 
     @Override
     public void initView() {
@@ -236,7 +256,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
         qiuView = new QiuView(DrawActivity.this);
         drawing_button_id = findViewById(R.id.drawing_button_id);
         drawing_button_rg = (RadioGroup) findViewById(R.id.drawing_button_rg);
-        drawing_c_hb_tv = (TextView) findViewById(R.id.drawing_c_hb_tv);
+//        drawing_c_hb_tv = (TextView) findViewById(R.id.drawing_c_hb_tv);
         drawing_button_RecyclerView = (RecyclerView) findViewById(R.id.drawing_button_RecyclerView);
         drawing_button_linearlayout = (LinearLayout) findViewById(R.id.drawing_button_linearlayout);
         drawing_button_RecyclerView.setNestedScrollingEnabled(false);
@@ -247,6 +267,8 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
         right_seekBar_ll = (LinearLayout) findViewById(R.id.right_seekBar_ll);
 //        drawing_c_hb_ll = (LinearLayout) findViewById(R.id.drawing_c_hb_ll);
         drawing_c_tm_progress_ll = (LinearLayout) findViewById(R.id.drawing_c_tm_progress_ll);
+
+
         baseRecyclerAdapter = new BaseRecyclerAdapter<String>(color_list, R.layout.color_text_item) {
             @Override
             protected void onBindViewHolder(SmartViewHolder holder, final String model, int position) {
@@ -255,10 +277,11 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
                     @Override
                     public void onClick(View v) {
                         drawing_color.setBackgroundColor(Color.parseColor(model));
-                        mDrawView.changePaintColor(Color.parseColor(model));
+                        mSketchView.setStrokeColor(Color.parseColor(model));
+                        mSketchView.setStrokeSize(mVerticalSeekBar.getProgress() / stroke);
                         c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
                         isxp = false;
-                        mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress());
+//                        mSketchView.setMyAlpha(drawing_c_hb_seekBar.getProgress());
                         drawing_button_RecyclerView.setVisibility(View.GONE);
                         drawing_button_linearlayout.setVisibility(View.VISIBLE);
                     }
@@ -280,43 +303,42 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
         initColorPickerDialog();
         //初始化自定义的ToolBar
         initToolbar();
-        mDrawView = (DrawView) findViewById(R.id.draw_view);
+//        mDrawView = (DrawView) findViewById(R.id.draw_view);
         mVerticalSeekBar = (VerticalSeekBar) findViewById(R.id.seekBar);
-        drawing_c_hb_seekBar = (VerticalSeekBar) findViewById(R.id.drawing_c_hb_seekBar);
+//        drawing_c_hb_seekBar = (VerticalSeekBar) findViewById(R.id.drawing_c_hb_seekBar);
         right_seekBar = (VerticalSeekBar) findViewById(R.id.right_seekBar);
 
         right_seekBar.setProgress(ScreenBrightness.getScreenBrightness(getBaseContext()));
-        drawing_c_hb_seekBar.setMaxProgress(255);
-        drawing_c_hb_seekBar.setProgress(255);
+//        drawing_c_hb_seekBar.setMaxProgress(255);
+//        drawing_c_hb_seekBar.setProgress(255);
         mVerticalSeekBar.setMaxProgress(100);
         right_seekBar.setMaxProgress(255);
-        drawing_c_hb_seekBar.setOnSlideChangeListener(new VerticalSeekBar.SlideChangeListener() {
-            @Override
-            public void onStart(VerticalSeekBar slideView, int progress) {
-
-            }
-
-            @Override
-            public void onProgress(VerticalSeekBar slideView, int progress) {
-                mDrawView.getPaint().setColor(mDrawView.getPaint().getColor());
-                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress());
-                tmd = progress;
-                double a = progress;
-                double b = 255;
-                double d = a / b;
-                if (d < 0.01) {
-                    drawing_c_hb_tv.setText("0.01");
-                } else {
-                    drawing_c_hb_tv.setText(String.format("%.2f", d));
-                }
-
-            }
-
-            @Override
-            public void onStop(VerticalSeekBar slideView, int progress) {
-
-            }
-        });
+//        drawing_c_hb_seekBar.setOnSlideChangeListener(new VerticalSeekBar.SlideChangeListener() {
+//            @Override
+//            public void onStart(VerticalSeekBar slideView, int progress) {
+//
+//            }
+//
+//            @Override
+//            public void onProgress(VerticalSeekBar slideView, int progress) {
+//                mSketchView.setMyAlpha(drawing_c_hb_seekBar.getProgress());
+//                tmd = progress;
+//                double a = progress;
+//                double b = 255;
+//                double d = a / b;
+////                if (d < 0.01) {
+////                    drawing_c_hb_tv.setText("0.01");
+////                } else {
+////                    drawing_c_hb_tv.setText(String.format("%.2f", d));
+////                }
+//
+//            }
+//
+//            @Override
+//            public void onStop(VerticalSeekBar slideView, int progress) {
+//
+//            }
+//        });
         mVerticalSeekBar.setOnSlideChangeListener(new VerticalSeekBar.SlideChangeListener() {
             @Override
             public void onStart(VerticalSeekBar slideView, int progress) {
@@ -326,9 +348,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onProgress(VerticalSeekBar slideView, int progress) {
                 double a;
-
-                Log.e("AAA",(progress / stroke)+"");
-                mDrawView.changePaintSize(progress / stroke);
+                mSketchView.setStrokeSize(progress / stroke);
                 if (progress < 10) {
                     a = 10;
                 } else {
@@ -389,19 +409,32 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
         drawing_button_rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
-
                 drawing_c_tm_progress_ll.setVisibility(View.INVISIBLE);
 //                drawing_c_hb_ll.setVisibility(View.INVISIBLE);
                 right_seekBar_ll.setVisibility(View.INVISIBLE);
                 switch (radioGroup.getCheckedRadioButtonId()) {
                     case R.id.rb_two:
-                        drawing_c_tm_progress_ll.setVisibility(View.VISIBLE);
+                        if (drawing_c_tm_progress_ll.getVisibility() == View.INVISIBLE) {
+                            drawing_c_tm_progress_ll.setVisibility(View.VISIBLE);
+                        } else {
+                            drawing_c_tm_progress_ll.setVisibility(View.INVISIBLE);
+                            RadioButton radioButton = (RadioButton) findViewById(R.id.rb_four);
+                            radioButton.setChecked(true);
+                        }
+
                         break;
-                    case R.id.rb_three:
+//                    case R.id.rb_three:
 //                        drawing_c_hb_ll.setVisibility(View.VISIBLE);
-                        break;
+//                        break;
                     case R.id.rb_four:
-                        right_seekBar_ll.setVisibility(View.VISIBLE);
+                        if (right_seekBar_ll.getVisibility() == View.INVISIBLE) {
+                            right_seekBar_ll.setVisibility(View.VISIBLE);
+                        } else {
+                            right_seekBar_ll.setVisibility(View.INVISIBLE);
+                            RadioButton radioButton = (RadioButton) findViewById(R.id.rb_four);
+                            radioButton.setChecked(false);
+                        }
+//                        right_seekBar_ll.setVisibility(View.VISIBLE);
                         break;
 
                 }
@@ -410,7 +443,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
         });
 
 
-        mDrawView.changePaintSize(mVerticalSeekBar.getProgress() / stroke);
+//        mSketchView.setStrokeSize(mVerticalSeekBar.getProgress() / stroke);
         //初始化TAB
         initNavigationTab();
         //初始化模式选择的PopupWindow
@@ -425,7 +458,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
         mBuilder.setPositiveButton("保存", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mDrawView.saveNew(getBaseContext());
+//                mDrawView.saveNew(getBaseContext());
             }
         });
         mBuilder.setNegativeButton("不保存", new DialogInterface.OnClickListener() {
@@ -533,9 +566,9 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
             case R.id.draw_color_one://第一个颜色
                 drawing_color.setBackgroundColor(Color.parseColor("#000000"));
                 c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
-                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress());
-                mDrawView.changePaintColor(Color.parseColor("#000000"));
-                mDrawView.changePaintSize(mVerticalSeekBar.getProgress() / stroke);
+//                mSketchView.setMyAlpha(drawing_c_hb_seekBar.getProgress());
+                mSketchView.setStrokeColor(Color.parseColor("#000000"));
+                mSketchView.setStrokeSize(mVerticalSeekBar.getProgress() / stroke);
                 isxp = false;
 
                 break;
@@ -544,18 +577,16 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
 
                 drawing_color.setBackgroundColor(Color.parseColor("#0000FE"));
                 c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
-                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress());
-                mDrawView.changePaintColor(Color.parseColor("#0000FE"));
-                mDrawView.changePaintSize(mVerticalSeekBar.getProgress() / stroke);
+                mSketchView.setStrokeColor(Color.parseColor("#0000FE"));
+                mSketchView.setStrokeSize(mVerticalSeekBar.getProgress() / stroke);
                 isxp = false;
                 break;
 
             case R.id.draw_color_three://第三个颜色
                 drawing_color.setBackgroundColor(Color.parseColor("#FE0000"));
-                mDrawView.changePaintColor(Color.parseColor("#FE0000"));
+                mSketchView.setStrokeColor(Color.parseColor("#FE0000"));
                 c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
-                mDrawView.setMyAlpha(drawing_c_hb_seekBar.getProgress());
-                mDrawView.changePaintSize(mVerticalSeekBar.getProgress() / stroke);
+                mSketchView.setStrokeSize(mVerticalSeekBar.getProgress() / stroke);
                 isxp = false;
                 break;
 
@@ -570,28 +601,27 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
 
             case R.id.drawing_go_back://撤回一步
 
-                mDrawView.BackView();
+                mSketchView.BackView();
 
                 break;
 
             case R.id.drawing_go_clear://清除滑板
-                mDrawView.clearView();
+                mSketchView.clearView();
                 break;
             case R.id.drawing_c_xp://橡皮
                 if (isxp) {
-//                    mDrawView.setCurrentState(PathState.getInstance());
                     colorDrawable = (ColorDrawable) drawing_color.getBackground();
                     colorDrawable.getColor();
-                    mDrawView.changePaintColor(colorDrawable.getColor());
+                    mSketchView.setStrokeColor(colorDrawable.getColor());
+                    mSketchView.setStrokeSize(mVerticalSeekBar.getProgress() / stroke);
                     c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp));
                     isxp = false;
                 } else {
-                    mDrawView.changePaintColor(Color.parseColor("#FFFFFF"));
+                    mSketchView.setStrokeColor(Color.parseColor("#FFFFFF"));
                     c_xp.setImageDrawable(getResources().getDrawable(R.mipmap.c_xp_not));
+                    mSketchView.setStrokeSize(255 / 6);
                     isxp = true;
                 }
-
-
                 break;
 
             case R.id.ll_back:
@@ -611,13 +641,6 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
                 }
 
                 break;
-            case R.id.ll_num:
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                break;
-            case R.id.ll_add:
-                break;
-            case R.id.ll_undo:
-                break;
             case R.id.ll_redo:
                 try {
                     Process proc = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot -p"}); //关机
@@ -627,22 +650,19 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
             case R.id.ll_reset:
-//                mDrawView.setCanvasCode(NoteApplication.CANVAS_RESET);
-//                mDrawView.invalidate();
-//                dataReset();
-//                mBuilder.show();
-//                if (mDrawView.getHasDraw()) {
-//                    mDrawView.saveNew(getBaseContext());
+                if (saveData != null) {
+                    mSketchView.updata(saveData, getBaseContext());
+                } else {
+                    mSketchView.saveNew(getBaseContext());
+                }
                 startActivity(new Intent(DrawActivity.this, HomeActivity.class));
-//                } else {
-//                    startActivity(new Intent(DrawActivity.this, HomeActivity.class));
-//                }
+                finish();
                 break;
             case R.id.ll_save:
                 if (saveData != null) {
-                    mDrawView.updata(saveData, getBaseContext());
+                    mSketchView.updata(saveData, getBaseContext());
                 } else {
-                    mDrawView.saveNew(getBaseContext());
+                    mSketchView.saveNew(getBaseContext());
                 }
 
                 break;
@@ -655,7 +675,6 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
                 mModeSelectWindow.showPopupWindow(v);
                 break;
             case R.id.rl_shear:
-                //mDrawView.setCurrentState(ShearState.getInstance(mDrawView));
                 break;
             case R.id.rl_hard_eraser:
                 break;
@@ -670,12 +689,10 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void finish() {
         super.finish();
-        dataReset();
-        stateReset();
-        File temporaryFile = new File(NoteApplication.TEMPORARY_PATH);
-        if (temporaryFile.exists()) {
-            FileUtils.delete(temporaryFile);
-        }
+//        File temporaryFile = new File(NoteApplication.TEMPORARY_PATH);
+//        if (temporaryFile.exists()) {
+//            FileUtils.delete(temporaryFile);
+//        }
     }
 
 
@@ -723,5 +740,22 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener {
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(qiuView);
         toast.show();
+    }
+
+    void setAlpha(View v, float alpha) {
+        v.setAlpha(alpha);
+    }
+
+    @Override
+    public void onDrawChanged() {
+
+        if (drawing_button_rg != null) {
+            drawing_button_rg.clearCheck();
+        }
+        if (drawing_button_RecyclerView.getVisibility() == View.VISIBLE) {
+            drawing_button_RecyclerView.setVisibility(View.GONE);
+            drawing_button_linearlayout.setVisibility(View.VISIBLE);
+        }
+
     }
 }

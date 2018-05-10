@@ -26,13 +26,14 @@
 
         <activity
             android:name=".view.activity.HomeActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="landscape">
 
         </activity>
         <activity
             android:name=".view.activity.DrawActivity"
             android:screenOrientation="landscape"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

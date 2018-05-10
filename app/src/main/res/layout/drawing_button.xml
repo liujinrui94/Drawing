@@ -11,7 +11,7 @@
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:weightSum="10">
+        android:weightSum="9">
 
         <TextView
             android:layout_width="50dp"
@@ -82,7 +82,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
+     <!--   <LinearLayout
             android:id="@+id/drawing_c_hb_ll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
                 android:progress="255"
                 android:scrollbarSize="300dp"
                 android:thumbOffset="0dp" />
-        </LinearLayout>
+        </LinearLayout>-->
 
         <LinearLayout
             android:id="@+id/right_seekBar_ll"
@@ -158,7 +158,7 @@
         android:gravity="bottom"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:weightSum="10">
+        android:weightSum="9">
 
         <TextView
             android:id="@+id/draw_color_one"
@@ -241,14 +241,14 @@
                 android:gravity="center_horizontal|bottom"
                 android:text="透明度"
                 android:textColor="@color/black"
-                android:visibility="gone" />
+               />
         </LinearLayout>
 
         <RadioGroup
             android:id="@+id/drawing_button_rg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:layout_weight="2"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
@@ -262,7 +262,7 @@
                 android:text="粗细"
                 android:textColor="@drawable/text_color" />
 
-            <RadioButton
+          <!--  <RadioButton
                 android:id="@+id/rb_three"
                 style="@style/MyTabButton"
                 android:layout_width="50dp"
@@ -270,7 +270,7 @@
                 android:layout_height="match_parent"
                 android:drawableTop="@drawable/selector_tm"
                 android:text="透明度"
-                android:textColor="@drawable/text_color" />
+                android:textColor="@drawable/text_color" />-->
 
             <RadioButton
                 android:id="@+id/rb_four"
