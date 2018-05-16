@@ -15,6 +15,7 @@ import com.rdc.drawing.R;
 import com.rdc.drawing.bean.HomeBean;
 import com.rdc.drawing.config.NoteApplication;
 import com.rdc.drawing.utils.FileUtils;
+import com.rdc.drawing.utils.GlideUtils;
 import com.rdc.drawing.view.activity.DrawActivity;
 
 import java.io.File;
@@ -109,12 +110,12 @@ public class MainAdapter extends BaseAdapter {
         } else {
             holder.select_image.setImageDrawable(mContext.getResources().getDrawable(R.mipmap.w_noselect));
         }
-        NoteApplication.getInstance(mContext).displayImage("file:///" + mPathList.get(position).getMap().get("picturePath"), holder.mImageView);
+//        NoteApplication.getInstance(mContext).displayImage("file:///" + mPathList.get(position).getMap().get("picturePath"), holder.mImageView);
         holder.name.setText(
                 (mPathList.get(position).getMap().get("picturePath").substring(mPathList.get(position).getMap().get("picturePath").lastIndexOf("/") + 1, mPathList.get(position).getMap().get("picturePath").length())
                 ).replace(".png", "")
         );
-//        GlideUtils.getInstance().loadLocalImage(new File("file:///" + mPathList.get(position).get("picturePath")),holder.mImageView);
+        GlideUtils.getInstance().loadLocalImage(new File("file:///" + mPathList.get(position).getMap().get("picturePath")),holder.mImageView);
 
 //        Glide.with(mContext).load(new File("file:///" + mPathList.get(position).get("picturePath"))).into(holder.mImageView);
 

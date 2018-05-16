@@ -32,7 +32,7 @@ import java.util.List;
  * Created by Edianzu on 2018/4/12.
  */
 
-public class HomeActivity extends Activity {
+public class HomeActivity extends BaseActivity {
 
     DaoSession daoSession = NoteApplication.getsInstance().getDaoSession();
 
@@ -44,6 +44,7 @@ public class HomeActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
@@ -52,7 +53,6 @@ public class HomeActivity extends Activity {
         } else {
             initView();
         }
-
     }
 
     @Override
@@ -62,7 +62,7 @@ public class HomeActivity extends Activity {
         baseRecyclerAdapter.refresh(saveDataList);
     }
 
-    private void initView() {
+    public void initView() {
         findViewById(R.id.add_draw).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

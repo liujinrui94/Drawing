@@ -1,10 +1,12 @@
 package com.rdc.drawing.view.activity;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -14,6 +16,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -59,6 +62,7 @@ import com.rdc.drawing.utils.BaseProgressDialog;
 import com.rdc.drawing.utils.CommandUtils;
 import com.rdc.drawing.utils.DrawDataUtils;
 import com.rdc.drawing.utils.FileUtils;
+import com.rdc.drawing.utils.PermissionsUtil;
 import com.rdc.drawing.utils.ScreenBrightness;
 import com.rdc.drawing.view.widget.ModeSelectWindow;
 import com.rdc.drawing.view.widget.QiuView;
@@ -79,19 +83,14 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     //初始化对话框
     private AppCompatDialog mAppCompatDialog;
     private VerticalSeekBar mVerticalSeekBar;
-//    private VerticalSeekBar drawing_c_hb_seekBar;
+    //    private VerticalSeekBar drawing_c_hb_seekBar;
 //    private DrawView mDrawView;
-
+    private final String[] needPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private TextView mTVSelectMode;
     private TextView mTVPageSize;
     private String mPicturePath = null;
     private int mPageSize = 1;
     private ModeSelectWindow mModeSelectWindow;
-    //抽屉
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private PictureAdapter mPageAdapter;
-    private List<String> list = null;
     private AlertDialog.Builder mBuilder;
     private VerticalSeekBar right_seekBar;
 
@@ -111,8 +110,6 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
     private QiuView qiuView;
     private View drawing_button_id;
-
-    private Button btn_back;
 
 
     public static final String ACTION_REQUEST_SHUTDOWN = "android.intent.action.ACTION_REQUEST_SHUTDOWN";
@@ -143,15 +140,17 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     private Bitmap bitmap;
     private int mScreenWidth;
     private int mScreenHeight;
+    private static final int PERMISSIONS_REQUEST_STORAGE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_draw);
         initView();
-
+//        NoteApplication.getRefWatcher(getBaseContext()).watch(this);
         saveData = (SaveData) getIntent().getSerializableExtra("model");
         mSketchView = (SketchView) findViewById(R.id.drawing);
         if (saveData != null) {
@@ -172,24 +171,40 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         p.width = mScreenWidth;
         p.height = mScreenHeight;
         mSketchView.setLayoutParams(p);
-
     }
 
+    private boolean checkStoragePermissions() {
+        if (PermissionsUtil.hasPermissions(getBaseContext(), needPermissions)) {
+            return true;
+        } else {
+            PermissionsUtil.requestPermissions(this, "需要存储权限"
+                    , PERMISSIONS_REQUEST_STORAGE, needPermissions);
+        }
+        return false;
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mSketchView.recycle();
+
         releaseImageViewResouce();
-        System.gc();
     }
 
+    public void releaseImageViewResouce(Bitmap mbitmap) {
+        if (mbitmap != null && !mbitmap.isRecycled()) {
+            mbitmap.recycle();
+            System.gc();
+        }
+    }
 
     public void releaseImageViewResouce() {
         if (bitmap != null && !bitmap.isRecycled()) {
             bitmap.recycle();
+            bitmap = null;
+            System.gc();
         }
     }
-
 //    private void initDrawData() {
 //        Intent intent = getIntent();
 //        mPicturePath = intent.getStringExtra("path");
@@ -290,7 +305,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         };
         drawing_button_RecyclerView.setAdapter(baseRecyclerAdapter);
         drawing_progress = (TextView) findViewById(R.id.drawing_progress);
-
+        draw_color_one = (TextView) findViewById(R.id.draw_color_one);
         findViewById(R.id.draw_color_one).setOnClickListener(this);
         findViewById(R.id.draw_color_two).setOnClickListener(this);
         findViewById(R.id.draw_color_three).setOnClickListener(this);
@@ -347,6 +362,9 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
             @Override
             public void onProgress(VerticalSeekBar slideView, int progress) {
+                if (isxp) {
+                    return;
+                }
                 double a;
                 mSketchView.setStrokeSize(progress / stroke);
                 if (progress < 10) {
@@ -445,7 +463,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
 //        mSketchView.setStrokeSize(mVerticalSeekBar.getProgress() / stroke);
         //初始化TAB
-        initNavigationTab();
+//        initNavigationTab();
         //初始化模式选择的PopupWindow
         initDrawerLayout();
         initDialog();
@@ -490,16 +508,16 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     /**
      * 初始化导航Tab
      */
-    private void initNavigationTab() {
-        findViewById(R.id.rl_color_select_dialog).setOnClickListener(this);
-        findViewById(R.id.rl_pencil_menu_select).setOnClickListener(this);
-        findViewById(R.id.rl_mode_select).setOnClickListener(this);
-        mTVSelectMode = (TextView) findViewById(R.id.tv_select_mode);
-        findViewById(R.id.rl_shear).setOnClickListener(this);
-        findViewById(R.id.rl_hard_eraser).setOnClickListener(this);
-
-        draw_color_one = (TextView) findViewById(R.id.draw_color_one);
-    }
+//    private void initNavigationTab() {
+//        findViewById(R.id.rl_color_select_dialog).setOnClickListener(this);
+//        findViewById(R.id.rl_pencil_menu_select).setOnClickListener(this);
+//        findViewById(R.id.rl_mode_select).setOnClickListener(this);
+//        mTVSelectMode = (TextView) findViewById(R.id.tv_select_mode);
+//        findViewById(R.id.rl_shear).setOnClickListener(this);
+//        findViewById(R.id.rl_hard_eraser).setOnClickListener(this);
+//
+//        draw_color_one = (TextView) findViewById(R.id.draw_color_one);
+//    }
 
     /**
      * 初始化一个颜色选择板块
@@ -526,27 +544,27 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
     private void initDrawerLayout() {
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                null, R.string.open, R.string.close) {
-
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                invalidateOptionsMenu();
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu();
-                mPageAdapter.notifyDataSetChanged();
-            }
-
-        };
-
-        list = new ArrayList<>();
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
-        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        mPageAdapter = new PictureAdapter(this, list);
+//        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+//                null, R.string.open, R.string.close) {
+//
+//            public void onDrawerClosed(View view) {
+//                super.onDrawerClosed(view);
+//                invalidateOptionsMenu();
+//            }
+//
+//            public void onDrawerOpened(View drawerView) {
+//                super.onDrawerOpened(drawerView);
+//                invalidateOptionsMenu();
+//                mPageAdapter.notifyDataSetChanged();
+//            }
+//
+//        };
+//
+//        list = new ArrayList<>();
+//        mDrawerLayout.addDrawerListener(mDrawerToggle);
+//        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+//        mPageAdapter = new PictureAdapter(this, list);
 //        mListView.setAdapter(mPageAdapter);
 //        mListView.setOnItemClickListener(this);
     }
@@ -659,12 +677,13 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 finish();
                 break;
             case R.id.ll_save:
-                if (saveData != null) {
-                    mSketchView.updata(saveData, getBaseContext());
-                } else {
-                    mSketchView.saveNew(getBaseContext());
+                if (checkStoragePermissions()) {
+                    if (saveData != null) {
+                        mSketchView.updata(saveData, getBaseContext());
+                    } else {
+                        mSketchView.saveNew(getBaseContext());
+                    }
                 }
-
                 break;
             case R.id.rl_pencil_menu_select:
                 break;
@@ -685,14 +704,29 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkStoragePermissions();
+                } else {
+                    if (PermissionsUtil.somePermissionPermanentlyDenied(this, needPermissions)) {
+                        PermissionsUtil.goSettings2Permissions(this, "需要权限"
+                                , "去设置", PERMISSIONS_REQUEST_STORAGE);
+                    } else {
+
+                    }
+                }
+                break;
+        }
+    }
 
     @Override
     public void finish() {
         super.finish();
-//        File temporaryFile = new File(NoteApplication.TEMPORARY_PATH);
-//        if (temporaryFile.exists()) {
-//            FileUtils.delete(temporaryFile);
-//        }
+        releaseImageViewResouce();
     }
 
 

@@ -5,16 +5,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
-import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.rdc.drawing.board.dao.DaoMaster;
 import com.rdc.drawing.board.dao.DaoSession;
 import com.rdc.drawing.utils.CrashHandler;
 import com.rdc.drawing.view.activity.BaseActivity;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.Stack;
 
@@ -49,6 +44,7 @@ public class NoteApplication extends Application {
     private SQLiteDatabase db;
     private DaoMaster mDaoMaster;
     private DaoSession mDaoSession;
+    private RefWatcher refWatcher;
     //静态单例
     public static NoteApplication instances;
     public static NoteApplication getsInstance() {
@@ -58,8 +54,14 @@ public class NoteApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instances = this;
+//        LeakCanary.install(this);
+//        refWatcher = LeakCanary.install(this);
         CrashHandler.getInstance().init(this);
         setDatabase();
+    }
+    public static RefWatcher getRefWatcher(Context context) {
+        NoteApplication application = (NoteApplication) context.getApplicationContext();
+        return application.refWatcher;
     }
 
     public static NoteApplication getInstance() {
@@ -89,25 +91,6 @@ public class NoteApplication extends Application {
         return db;
     }
 
-
-    public static ImageLoader getInstance(Context context) {
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration
-                .Builder(context)
-                .memoryCacheExtraOptions(480, 800) // max width, max height，即保存的每个缓存文件的最大长宽
-                .threadPoolSize(3)//线程池内加载的数量
-                .threadPriority(Thread.NORM_PRIORITY - 2)
-                .denyCacheImageMultipleSizesInMemory()
-                .memoryCache(new UsingFreqLimitedMemoryCache(2 * 1024 * 1024)) // You can pass your own memory cache implementation/你可以通过自己的内存缓存实现
-                .memoryCacheSize(2 * 1024 * 1024)
-                .tasksProcessingOrder(QueueProcessingType.LIFO)
-                .defaultDisplayImageOptions(DisplayImageOptions.createSimple())
-                .imageDownloader(new BaseImageDownloader(context, 5 * 1000, 30 * 1000)) // connectTimeout (5 s), readTimeout (30 s)超时时间
-                .writeDebugLogs() // Remove for release app
-                .build();//开始构建
-
-        ImageLoader.getInstance().init(config);
-        return ImageLoader.getInstance();
-    }
 
     public void addActivity(BaseActivity activity) {
         if (allActivity == null) {

@@ -51,7 +51,7 @@ public class PictureAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        NoteApplication.getInstance(mContext).displayImage("file:///" + mPathList.get(position), holder.mImageView);
+//        NoteApplication.getInstance(mContext).displayImage("file:///" + mPathList.get(position), holder.mImageView);
         return convertView;
     }
 

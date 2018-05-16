@@ -6,15 +6,14 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -23,13 +22,11 @@ import com.rdc.drawing.bean.SaveData;
 import com.rdc.drawing.board.dao.DaoSession;
 import com.rdc.drawing.config.NoteApplication;
 import com.rdc.drawing.utils.ImageUtil;
-import com.rdc.drawing.utils.MemoryUtils;
-import com.rdc.drawing.view.widget.signature.FirstPoint;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class SketchView extends ImageView implements View.OnTouchListener {
+public class SketchView extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener {
 
     public static final int STROKE = 0;
     public static final int ERASER = 1;
@@ -164,6 +161,7 @@ public class SketchView extends ImageView implements View.OnTouchListener {
         setMeasuredDimension(width, height);
     }
 
+
     @Override
     public boolean onTouch(View arg0, MotionEvent event) {
         if (radioGroup != null) {
@@ -177,9 +175,6 @@ public class SketchView extends ImageView implements View.OnTouchListener {
         float y = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (hasMove) {
-
-                }
                 touch_start(x, y);
                 invalidate();
                 break;
@@ -203,8 +198,13 @@ public class SketchView extends ImageView implements View.OnTouchListener {
             canvas.drawBitmap(bitmap, 0, 0, null);
         }
         for (Pair<Path, Paint> p : paths) {
+//            canvas.setDrawFilter(new PaintFlagsDrawFilter(0,Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG));
             canvas.drawPath(p.first, p.second);
         }
+    }
+
+    public Bitmap getDrawBitmap() {
+        return bitmap;
     }
 
     private void touch_start(float x, float y) {
@@ -230,7 +230,7 @@ public class SketchView extends ImageView implements View.OnTouchListener {
             m_Path.moveTo(x, y);
         } else {
             m_Path.moveTo(x, y);
-            m_Path.quadTo(x, y, (float) (x + 0.01), y);
+            m_Path.quadTo(x, y, x, y);
         }
         mX = x;
         mY = y;
@@ -271,7 +271,13 @@ public class SketchView extends ImageView implements View.OnTouchListener {
     }
 
     public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Bitmap cbitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        if (bitmap != null && !bitmap.isRecycled()) {
+            bitmap.recycle();
+        }
+        this.bitmap = cbitmap;
+//        cbitmap=null;
+//        cbitmap.recycle();
     }
 
     // 撤销一笔
@@ -328,6 +334,15 @@ public class SketchView extends ImageView implements View.OnTouchListener {
 
     public void setOnDrawChangedListener(OnDrawChangedListener listener) {
         this.onDrawChangedListener = listener;
+    }
+
+    public void recycle() {
+        if (bitmap != null && !bitmap.isRecycled()) {
+            // 回收并且置为null
+            bitmap.recycle();
+            bitmap = null;
+        }
+        System.gc();
     }
 
     public interface OnDrawChangedListener {

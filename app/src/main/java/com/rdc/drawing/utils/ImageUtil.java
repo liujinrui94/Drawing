@@ -49,6 +49,7 @@ public class ImageUtil {
         byte[] bitmapData = baos.toByteArray();
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(bitmapData);
+        fos.close();
         return file;
     }
 
