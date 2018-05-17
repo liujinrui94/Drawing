@@ -14,40 +14,41 @@
 
         <TextView
             android:id="@+id/back"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
-            android:gravity="center_vertical"
+            android:background="@drawable/red_button_background"
             android:drawableLeft="@mipmap/back"
-            android:textColor="@color/white"
             android:drawablePadding="3dp"
-            android:layout_weight="1"
-            android:text="返回" />
+            android:gravity="center_vertical"
+            android:padding="3dp"
+            android:text="返回"
+            android:textColor="@color/white"
+            android:textSize="18dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="invisible"
             android:gravity="center_horizontal"
-            android:text="文件夹" />
+            android:text="文件夹"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/delect"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
-            android:layout_weight="1"
+            android:background="@drawable/red_button_background"
+            android:padding="3dp"
+            android:text="删除"
             android:textColor="@color/white"
-            android:gravity="right"
-            android:text="删除" />
+            android:textSize="18dp" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_below="@id/linearLayout"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linearLayout">
 
 
     </android.support.v7.widget.RecyclerView>
@@ -57,8 +58,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/linearLayout"
-        android:visibility="gone"
-        android:numColumns="4" />
+        android:numColumns="4"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/add_draw"

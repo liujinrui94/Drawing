@@ -45,7 +45,7 @@ public class ImageUtil {
     public static File getFileFromBitmap(Bitmap bitmap, File file)
             throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        bitmap.compress(Bitmap.CompressFormat.WEBP, 100, baos);
         byte[] bitmapData = baos.toByteArray();
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(bitmapData);

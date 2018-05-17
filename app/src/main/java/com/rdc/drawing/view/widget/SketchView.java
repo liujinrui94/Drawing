@@ -179,12 +179,10 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
-                hasMove = true;
                 touch_move(x, y);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                hasMove = false;
                 touch_up();
                 invalidate();
                 break;
@@ -198,7 +196,6 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
             canvas.drawBitmap(bitmap, 0, 0, null);
         }
         for (Pair<Path, Paint> p : paths) {
-//            canvas.setDrawFilter(new PaintFlagsDrawFilter(0,Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG));
             canvas.drawPath(p.first, p.second);
         }
     }
@@ -226,12 +223,11 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
         }
 
         m_Path.reset();
-        if (hasMove) {
+//        if (hasMove) {
             m_Path.moveTo(x, y);
-        } else {
-            m_Path.moveTo(x, y);
-            m_Path.quadTo(x, y, x, y);
-        }
+//        } else {
+//        m_Path.addCircle(x, y, m_Paint.getStrokeWidth() / 64, Path.Direction.CCW);
+//        }
         mX = x;
         mY = y;
     }
@@ -255,23 +251,37 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
     }
 
     // 返回画图结果用来保存
+//    public Bitmap getBitmap() {
+//        if (paths.size() == 0)
+//            return null;
+//        if (bitmap == null) {
+//            bitmap = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
+//            // 底色设置成白色
+//            bitmap.eraseColor(Color.WHITE);
+//        }
+//        Canvas canvas = new Canvas(bitmap);
+//        for (Pair<Path, Paint> p : paths) {
+//            canvas.drawPath(p.first, p.second);
+//        }
+//        return bitmap;
+//    }
+
     public Bitmap getBitmap() {
-        if (paths.size() == 0)
+        if (paths.size() == 0) {
             return null;
-        if (bitmap == null) {
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            // 底色设置成白色
-            bitmap.eraseColor(Color.WHITE);
+        } else {
+            Bitmap bitmap = Bitmap.createBitmap(this.getWidth(),
+                    this.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            canvas.drawColor(Color.WHITE);
+            this.layout(0,0,this.getWidth(),this.getHeight());
+            this.draw(canvas);
+            return bitmap;
         }
-        Canvas canvas = new Canvas(bitmap);
-        for (Pair<Path, Paint> p : paths) {
-            canvas.drawPath(p.first, p.second);
-        }
-        return bitmap;
     }
 
     public void setBitmap(Bitmap bitmap) {
-        Bitmap cbitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Bitmap cbitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
         if (bitmap != null && !bitmap.isRecycled()) {
             bitmap.recycle();
         }

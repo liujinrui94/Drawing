@@ -372,7 +372,6 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 } else {
                     a = progress;
                 }
-
                 double b = 100;
                 double d = a / b;
                 TextView textView = (TextView) findViewById(R.id.drawing_c_tm_progress);
