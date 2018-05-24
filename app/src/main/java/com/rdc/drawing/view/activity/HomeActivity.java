@@ -10,6 +10,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -47,12 +49,7 @@ public class HomeActivity extends BaseActivity {
 
         setContentView(R.layout.activity_main);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
-        Long l1 = new Long(201806181800l);
-        if (Long.parseLong(sdf.format(Calendar.getInstance().getTime())) > l1) {
-        } else {
-            initView();
-        }
+        initView();
     }
 
     @Override
@@ -170,6 +167,14 @@ public class HomeActivity extends BaseActivity {
 
         };
         recyclerView.setAdapter(baseRecyclerAdapter);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

@@ -755,6 +755,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
             if (DrawDataUtils.getInstance().getSaveDrawDataList().size() > 0) {
                 mBuilder.show();
             } else {
+                startActivity(new Intent(DrawActivity.this,HomeActivity.class));
                 DrawActivity.this.finish();
             }
         }
@@ -791,4 +792,5 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         }
 
     }
+
 }

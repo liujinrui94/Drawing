@@ -81,6 +81,9 @@ public class DrawView extends View implements View.OnTouchListener {
         this.setFocusableInTouchMode(true);
         this.setOnTouchListener(this);
         paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setAntiAlias(true);
     }
 

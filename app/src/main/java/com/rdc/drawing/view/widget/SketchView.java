@@ -56,8 +56,8 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
     public SketchView(Context context, AttributeSet attr) {
         super(context, attr);
 
-        setFocusable(true);
-        setFocusableInTouchMode(true);
+//        setFocusable(true);
+//        setFocusableInTouchMode(true);
         setBackgroundColor(Color.WHITE);
         this.setOnTouchListener(this);
         // 初始化paint
@@ -69,7 +69,7 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
         m_Paint.setStrokeJoin(Paint.Join.ROUND);
         m_Paint.setStrokeCap(Paint.Cap.ROUND);
         m_Paint.setStrokeWidth(strokeSize);
-        m_Paint.setAlpha(MyAlpha);
+//        m_Paint.setAlpha(MyAlpha);
         m_Path = new Path();
 
         invalidate();
@@ -164,7 +164,7 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
 
     @Override
     public boolean onTouch(View arg0, MotionEvent event) {
-        if (radioGroup != null) {
+        if (radioGroup.getCheckedRadioButtonId()!=0) {
             radioGroup.clearCheck();
         }
         if (recyclerView.getVisibility() == View.VISIBLE) {
@@ -183,10 +183,11 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                touch_up();
+                touch_up(x,y);
                 invalidate();
                 break;
         }
+
         return true;
     }
 
@@ -218,16 +219,14 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
         // 复制m_Paint
         Paint newPaint = new Paint(m_Paint);
         // 避免啥都没有的时候调用橡皮擦在那里乱擦
-        if (!(paths.size() == 0 && mode == ERASER && bitmap == null)) {
+        if (!(paths.size() == 0 &&mode == ERASER && bitmap == null)) {
             paths.add(new Pair<>(m_Path, newPaint));
         }
 
         m_Path.reset();
-//        if (hasMove) {
-            m_Path.moveTo(x, y);
-//        } else {
-//        m_Path.addCircle(x, y, m_Paint.getStrokeWidth() / 64, Path.Direction.CCW);
-//        }
+        m_Path.moveTo(x, y);
+        m_Path.quadTo(x, y, x, y);
+        m_Path.addCircle(x, y, m_Paint.getStrokeWidth() / 64, Path.Direction.CCW);
         mX = x;
         mY = y;
     }
@@ -238,8 +237,9 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
         mY = y;
     }
 
-    private void touch_up() {
-        m_Path.lineTo(mX, mY);
+    private void touch_up(float x, float y) {
+//        m_Path.moveTo(x, y);
+//        m_Path.quadTo(x, y, mX, mY);
         // 复制m_Paint
         Paint newPaint = new Paint(m_Paint);
         // 避免啥都没有的时候调用橡皮擦在那里乱擦
@@ -274,7 +274,7 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
                     this.getHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             canvas.drawColor(Color.WHITE);
-            this.layout(0,0,this.getWidth(),this.getHeight());
+            this.layout(0, 0, this.getWidth(), this.getHeight());
             this.draw(canvas);
             return bitmap;
         }

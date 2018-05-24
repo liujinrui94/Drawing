@@ -32,9 +32,9 @@ public class FirstPoint extends Point {
     }
 
     public void draw(Canvas canvas, Paint paint) {
-        paint.setColor(this.color);
-        paint.setAlpha(alpha);
-        canvas.drawCircle(this.fx, this.fy, this.width / 2, paint);
+//        paint.setColor(this.color);
+//        paint.setAlpha(alpha);
+//        canvas.drawCircle(this.fx, this.fy, this.width / 2, paint);
     }
 
     public float getFx() {
