@@ -60,9 +60,11 @@ import com.rdc.drawing.state.PathState;
 import com.rdc.drawing.state.RectangleState;
 import com.rdc.drawing.utils.BaseProgressDialog;
 import com.rdc.drawing.utils.CommandUtils;
+import com.rdc.drawing.utils.CrashHandler;
 import com.rdc.drawing.utils.DrawDataUtils;
 import com.rdc.drawing.utils.FileUtils;
 import com.rdc.drawing.utils.PermissionsUtil;
+import com.rdc.drawing.utils.RootUtils;
 import com.rdc.drawing.utils.ScreenBrightness;
 import com.rdc.drawing.view.widget.ModeSelectWindow;
 import com.rdc.drawing.view.widget.QiuView;
@@ -70,6 +72,7 @@ import com.rdc.drawing.view.widget.SketchView;
 import com.rdc.drawing.view.widget.VerticalSeekBar;
 import com.rdc.drawing.view.widget.signature.DrawView;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -659,12 +662,7 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
 
                 break;
             case R.id.ll_redo:
-                try {
-                    Process proc = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot -p"}); //关机
-                    proc.waitFor();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                showDialog();
                 break;
             case R.id.ll_reset:
                 if (saveData != null) {
@@ -701,6 +699,37 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 Log.e(TAG, Integer.toString(v.getId()));
                 break;
         }
+    }
+
+
+    static Process createSuProcess() throws IOException {
+        File rootUser = new File("/system/xbin/ru");
+        if (rootUser.exists()) {
+            return Runtime.getRuntime().exec(rootUser.getAbsolutePath());
+        } else {
+            return Runtime.getRuntime().exec("su");
+        }
+    }
+
+    static Process createSuProcess(String cmd) throws IOException {
+
+        DataOutputStream os = null;
+        Process process = createSuProcess();
+
+        try {
+            os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes(cmd + "\n");
+            os.writeBytes("exit $?\n");
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        return process;
     }
 
     @Override
@@ -749,13 +778,112 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     }
 
 
+    private void showDialog() {
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(DrawActivity.this);
+        normalDialog.setTitle("确定要关机吗");
+        normalDialog.setPositiveButton("确定",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String apkRoot = "chmod 777 " + getPackageCodePath();
+                        if (RootCommand(apkRoot)) {
+                            try {
+                                Process proc = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot -p"}); //关机
+                                proc.waitFor();
+                                //createSuProcess("reboot").waitFor();
+                            } catch (Exception e) {
+                                Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
+                                e.printStackTrace();
+                            }
+                        }else {
+                            Toast.makeText(getBaseContext(),"请在设置里打开app的root权限",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        normalDialog.setNegativeButton("取消",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //...To-do
+                    }
+                });
+        // 显示
+        normalDialog.show();
+    }
+
+
+    public static boolean RootCommand(String command)
+
+    {
+
+        Process process = null;
+
+        DataOutputStream os = null;
+
+        try
+
+        {
+
+            process = Runtime.getRuntime().exec("su");
+
+            os = new DataOutputStream(process.getOutputStream());
+
+            os.writeBytes(command + "\n");
+
+            os.writeBytes("exit\n");
+
+            os.flush();
+
+            process.waitFor();
+
+        } catch (Exception e)
+
+        {
+
+            Log.d("*** DEBUG ***", "ROOT REE" + e.getMessage());
+
+            return false;
+
+        } finally
+
+        {
+
+            try
+
+            {
+
+                if (os != null)
+
+                {
+
+                    os.close();
+
+                }
+
+                process.destroy();
+
+            } catch (Exception e)
+
+            {
+
+            }
+
+        }
+
+        Log.d("*** DEBUG ***", "Root SUC ");
+
+        return true;
+
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (DrawDataUtils.getInstance().getSaveDrawDataList().size() > 0) {
                 mBuilder.show();
             } else {
-                startActivity(new Intent(DrawActivity.this,HomeActivity.class));
+                startActivity(new Intent(DrawActivity.this, HomeActivity.class));
                 DrawActivity.this.finish();
             }
         }

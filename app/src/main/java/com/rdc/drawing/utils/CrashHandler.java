@@ -160,7 +160,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
      * @return 返回文件名称,便于将文件传送到服务器
      * @throws Exception
      */
-    private String saveCrashInfoFile(Throwable ex) throws Exception {
+    public String saveCrashInfoFile(Throwable ex) throws Exception {
         StringBuffer sb = new StringBuffer();
         try {
             SimpleDateFormat sDateFormat = new SimpleDateFormat(
@@ -221,6 +221,8 @@ public class CrashHandler implements UncaughtExceptionHandler {
     public static void setTag(String tag) {
         TAG = tag;
     }
+
+
 
     /**
      * 文件删除

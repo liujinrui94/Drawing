@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:applicationandroid="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.rdc.drawing">
 
+    package="com.rdc.drawing">
+<!--android:sharedUserId="android.uid.system"-->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
@@ -15,12 +15,15 @@
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.SHUTDOWN"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:name=".config.NoteApplication"
-
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+
         android:theme="@style/AppTheme">
         <activity
             android:name=".view.activity.MainActivity"
