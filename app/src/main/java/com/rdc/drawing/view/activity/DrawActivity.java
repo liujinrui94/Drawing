@@ -64,6 +64,7 @@ import com.rdc.drawing.utils.CrashHandler;
 import com.rdc.drawing.utils.DrawDataUtils;
 import com.rdc.drawing.utils.FileUtils;
 import com.rdc.drawing.utils.PermissionsUtil;
+import com.rdc.drawing.utils.RootCmd;
 import com.rdc.drawing.utils.RootUtils;
 import com.rdc.drawing.utils.ScreenBrightness;
 import com.rdc.drawing.view.widget.ModeSelectWindow;
@@ -786,15 +787,14 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String apkRoot = "chmod 777 " + getPackageCodePath();
-                        if (RootCommand(apkRoot)) {
+                        if (RootCmd.haveRoot()) {
                             try {
-                                Process proc = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot -p"}); //关机
-                                proc.waitFor();
-                                //createSuProcess("reboot").waitFor();
+                               String result= RootCmd.execRootCmd("reboot -p");
+                                Log.e("AAAA1",result);
                             } catch (Exception e) {
                                 Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
                                 e.printStackTrace();
+                                Log.e("AAAA2",e.toString());
                             }
                         }else {
                             Toast.makeText(getBaseContext(),"请在设置里打开app的root权限",Toast.LENGTH_LONG).show();
@@ -813,69 +813,6 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
     }
 
 
-    public static boolean RootCommand(String command)
-
-    {
-
-        Process process = null;
-
-        DataOutputStream os = null;
-
-        try
-
-        {
-
-            process = Runtime.getRuntime().exec("su");
-
-            os = new DataOutputStream(process.getOutputStream());
-
-            os.writeBytes(command + "\n");
-
-            os.writeBytes("exit\n");
-
-            os.flush();
-
-            process.waitFor();
-
-        } catch (Exception e)
-
-        {
-
-            Log.d("*** DEBUG ***", "ROOT REE" + e.getMessage());
-
-            return false;
-
-        } finally
-
-        {
-
-            try
-
-            {
-
-                if (os != null)
-
-                {
-
-                    os.close();
-
-                }
-
-                process.destroy();
-
-            } catch (Exception e)
-
-            {
-
-            }
-
-        }
-
-        Log.d("*** DEBUG ***", "Root SUC ");
-
-        return true;
-
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
