@@ -789,12 +789,10 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                     public void onClick(DialogInterface dialog, int which) {
                         if (RootCmd.haveRoot()) {
                             try {
-                               String result= RootCmd.execRootCmd("reboot -p");
-                                Log.e("AAAA1",result);
+                               RootCmd.execRootCmd("reboot -p");
                             } catch (Exception e) {
                                 Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
                                 e.printStackTrace();
-                                Log.e("AAAA2",e.toString());
                             }
                         }else {
                             Toast.makeText(getBaseContext(),"请在设置里打开app的root权限",Toast.LENGTH_LONG).show();

@@ -80,6 +80,7 @@
 
     <LinearLayout
         android:id="@+id/ll_redo"
+        android:visibility="gone"
         style="@style/toolbar_item_ll_style">
 
         <Button
