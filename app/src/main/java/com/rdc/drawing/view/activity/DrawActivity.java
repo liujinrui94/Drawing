@@ -177,15 +177,6 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         mSketchView.setLayoutParams(p);
     }
 
-    private boolean checkStoragePermissions() {
-        if (PermissionsUtil.hasPermissions(getBaseContext(), needPermissions)) {
-            return true;
-        } else {
-            PermissionsUtil.requestPermissions(this, "需要存储权限"
-                    , PERMISSIONS_REQUEST_STORAGE, needPermissions);
-        }
-        return false;
-    }
 
     @Override
     protected void onDestroy() {
@@ -646,15 +637,15 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 break;
 
             case R.id.ll_back:
-                if (ll_redo.getVisibility() == View.VISIBLE) {
-                    ll_redo.setVisibility(View.INVISIBLE);
+                if (ll_reset.getVisibility() == View.VISIBLE) {
+//                    ll_redo.setVisibility(View.INVISIBLE);
                     ll_reset.setVisibility(View.INVISIBLE);
                     ll_save.setVisibility(View.INVISIBLE);
                     drawing_button_id.setVisibility(View.GONE);
                     findViewById(R.id.btn_back).setBackground(getResources().getDrawable(R.mipmap.shrink));
                 } else {
                     drawing_button_id.setVisibility(View.VISIBLE);
-                    ll_redo.setVisibility(View.VISIBLE);
+//                    ll_redo.setVisibility(View.VISIBLE);
                     ll_reset.setVisibility(View.VISIBLE);
                     ll_save.setVisibility(View.VISIBLE);
                     drawing_button_id.setVisibility(View.VISIBLE);
@@ -675,12 +666,15 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                 finish();
                 break;
             case R.id.ll_save:
-                if (checkStoragePermissions()) {
+                if (PermissionsUtil.hasPermissions(getBaseContext(), needPermissions)) {
                     if (saveData != null) {
                         mSketchView.updata(saveData, getBaseContext());
                     } else {
                         mSketchView.saveNew(getBaseContext());
                     }
+                } else {
+                    PermissionsUtil.requestPermissions(this, "需要存储权限"
+                            , PERMISSIONS_REQUEST_STORAGE, needPermissions);
                 }
                 break;
             case R.id.rl_pencil_menu_select:
@@ -739,7 +733,8 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         switch (requestCode) {
             case PERMISSIONS_REQUEST_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkStoragePermissions();
+                    PermissionsUtil.requestPermissions(this, "需要存储权限"
+                            , PERMISSIONS_REQUEST_STORAGE, needPermissions);
                 } else {
                     if (PermissionsUtil.somePermissionPermanentlyDenied(this, needPermissions)) {
                         PermissionsUtil.goSettings2Permissions(this, "需要权限"
@@ -789,13 +784,13 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
                     public void onClick(DialogInterface dialog, int which) {
                         if (RootCmd.haveRoot()) {
                             try {
-                               RootCmd.execRootCmd("reboot -p");
+                                RootCmd.execRootCmd("reboot -p");
                             } catch (Exception e) {
                                 Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
                                 e.printStackTrace();
                             }
-                        }else {
-                            Toast.makeText(getBaseContext(),"请在设置里打开app的root权限",Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getBaseContext(), "请在设置里打开app的root权限", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -809,7 +804,6 @@ public class DrawActivity extends BaseActivity implements View.OnClickListener, 
         // 显示
         normalDialog.show();
     }
-
 
 
     @Override

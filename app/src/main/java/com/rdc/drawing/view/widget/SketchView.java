@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
@@ -63,6 +64,7 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
         // 初始化paint
         m_Paint = new Paint();
         m_Paint.setAntiAlias(true);
+        m_Paint.setFilterBitmap(true);
         m_Paint.setDither(true);
         m_Paint.setColor(strokeColor);
         m_Paint.setStyle(Paint.Style.STROKE);
@@ -138,6 +140,7 @@ public class SketchView extends android.support.v7.widget.AppCompatImageView imp
         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);  // 这是刷新单个文件
         intent.setData(uri);
         context.sendBroadcast(intent);
+        Toast.makeText(context, "保存成功", Toast.LENGTH_SHORT).show();
     }
 
 

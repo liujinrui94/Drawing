@@ -56,7 +56,7 @@ public class NoteApplication extends Application {
         instances = this;
 //        LeakCanary.install(this);
 //        refWatcher = LeakCanary.install(this);
-        CrashHandler.getInstance().init(this);
+//        CrashHandler.getInstance().init(this);
         setDatabase();
     }
     public static RefWatcher getRefWatcher(Context context) {
